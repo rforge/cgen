@@ -9,12 +9,15 @@ Both objects are independent and the only purpose is to test
 functions and show examples
 }
 \usage{
-rand_data(n,p_marker)
+rand_data(n,p_marker,h2=0.3,prop_qtl=0.01,seed=NULL)
 }
 
 \arguments{
   \item{n}{Number of oberservations}
   \item{p_marker}{Number of markers}
+  \item{h2}{Heritability of the trait}
+  \item{prop_qtl}{Proportion of QTL of total number of markers}
+  \item{seed}{Seed for RNG}
 }
 
 \value{
