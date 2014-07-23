@@ -15,10 +15,10 @@ The parallel scaling of this function is almost linear.
 
 
 \usage{
-clmm.CV(Y, X = NULL , random = NULL, par_random = NULL, niter=10000, burnin=5000,scale_e=0,df_e=-2, verbose = FALSE, seed = NULL)
+clmm.CV(y, X = NULL , random = NULL, par_random = NULL, niter=10000, burnin=5000,scale_e=0,df_e=-2, verbose = FALSE, seed = NULL)
 }
 \arguments{
-\item{Y}{list of phenotype vectors}
+\item{y}{list of phenotype vectors}
 \item{X}{Fixed effects design matrix of type: \code{matrix} or \code{dgCMatrix}. If omitted a column-vector of ones will be assigned }
 \item{random}{list of design matrices for random effects - every element of the list represents one random effect and may be of type: \code{matrix} or \code{dgCMatrix}}
 \item{par_random}{list of options for random effects. If passed, the list must have as many elements as \code{random}. Every element must be a list of 3:

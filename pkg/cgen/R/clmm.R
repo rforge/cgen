@@ -141,7 +141,7 @@ set.seed(seed)
 
 # clmm.CV
 
-clmm.CV <- function(Y, X = NULL , random = NULL, par_random = NULL, niter=10000, burnin=5000,scale_e=0,df_e=-2, verbose = FALSE, seed = NULL){
+clmm.CV <- function(y, X = NULL , random = NULL, par_random = NULL, niter=10000, burnin=5000,scale_e=0,df_e=-2, verbose = FALSE, seed = NULL){
 
 default_scale = 0
 default_df = -2
