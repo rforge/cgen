@@ -1,7 +1,0 @@
-useDynLib(cgen)
-exportPattern("^[[:alpha:]]+")
-importFrom(Rcpp, evalCpp)
-import(RcppEigen,Matrix)
-
-export("%c%")                                                                                                         
-export("%**%")   
