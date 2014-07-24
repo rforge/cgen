@@ -85,17 +85,6 @@ if(missing(random)) {
         if(is.null(par_random[[i]]$method)) stop(paste("Define a method for random-effect: ",i,sep=""))
         if(par_random[[i]]$method %in% allowed_methods == FALSE) stop(paste("Method must be one of: ",allowed_methods,sep=""))
 
-        if(is.null(par_random[[i]]$scale) | !is.numeric(par_random[[i]]$scale) | length(par_random[[i]]$scale) > 1) {
-
-          if(par_random[[i]]$method == "BayesA") { 
-
-## FIXME the scale for BayesA doesnt make sense for more than one phenotype
-            par_random[[i]]$scale = var(y[[1]],na.rm=T) / 2 / ncol(random[[i]]) } else {
-
-            par_random[[i]]$scale = default_scale }
-     
-        }
-
         if(is.null(par_random[[i]]$df) | !is.numeric(par_random[[i]]$df) | length(par_random[[i]]$df) > 1)  {
 
           if(par_random[[i]]$method == "BayesA") { 
@@ -105,6 +94,19 @@ if(missing(random)) {
               par_random[[i]]$df = default_df }
         
           }
+
+        if(is.null(par_random[[i]]$scale) | !is.numeric(par_random[[i]]$scale) | length(par_random[[i]]$scale) > 1) {
+
+          if(par_random[[i]]$method == "BayesA") { 
+
+## FIXME the scale for BayesA doesnt make sense for more than one phenotype
+            dfA <- par_random[[i]]$df
+            par_random[[i]]$scale = (((dfA-2)/dfA) * (var(y[[1]],na.rm=T) / 10)) / (ncol(random[[i]]) * mean(ccolmv(random[[i]],var=TRUE),na.rm=T)) } else {
+
+            par_random[[i]]$scale = default_scale }
+     
+        }
+
 
           if(class(random[[i]]) == "matrix") { type = "dense" } else { type = "sparse" }
           par_random[[i]]$sparse_or_dense = type 
@@ -203,17 +205,6 @@ if(missing(random)) {
         if(is.null(par_random[[i]]$method)) stop(paste("Define a method for random-effect: ",i,sep=""))
         if(par_random[[i]]$method %in% allowed_methods == FALSE) stop(paste("Method must be one of: ",allowed_methods,sep=""))
 
-        if(is.null(par_random[[i]]$scale) | !is.numeric(par_random[[i]]$scale) | length(par_random[[i]]$scale) > 1) {
-
-          if(par_random[[i]]$method == "BayesA") { 
-
-## FIXME the scale for BayesA doesnt make sense for more than one phenotype
-            par_random[[i]]$scale = var(y[[1]],na.rm=T) / 2 / ncol(random[[i]]) } else {
-
-            par_random[[i]]$scale = default_scale }
-     
-        }
-
         if(is.null(par_random[[i]]$df) | !is.numeric(par_random[[i]]$df) | length(par_random[[i]]$df) > 1)  {
 
           if(par_random[[i]]$method == "BayesA") { 
@@ -223,6 +214,18 @@ if(missing(random)) {
               par_random[[i]]$df = default_df }
         
           }
+
+        if(is.null(par_random[[i]]$scale) | !is.numeric(par_random[[i]]$scale) | length(par_random[[i]]$scale) > 1) {
+
+          if(par_random[[i]]$method == "BayesA") { 
+
+## FIXME the scale for BayesA doesnt make sense for more than one phenotype
+            dfA <- par_random[[i]]$df
+            par_random[[i]]$scale = (((dfA-2)/dfA) * (var(y[[1]],na.rm=T) / 10)) / (ncol(random[[i]]) * mean(ccolmv(random[[i]],var=TRUE),na.rm=T)) } else {
+
+            par_random[[i]]$scale = default_scale }
+     
+        }
 
           if(class(random[[i]]) == "matrix") { type = "dense" } else { type = "sparse" }
           par_random[[i]]$sparse_or_dense = type 
