@@ -363,7 +363,10 @@ if(n_qtl==0) n_qtl <- 1
 Vp=1
 h2=h2
 # sample variance explained by single qtl form chisquare
-var_a = rchisq(n_qtl,Vp*h2)/n_qtl
+#var_a = rchisq(n_qtl,Vp*h2)/n_qtl
+
+#same variance for every marker
+var_a = Vp*h2 / n_qtl
 qtl<-sample(1:ncol(M),n_qtl)
 alpha=sqrt((var_a)/(2*p[qtl]*q[qtl]))
 

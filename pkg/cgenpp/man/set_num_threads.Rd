@@ -34,15 +34,14 @@ set_num_threads(1)
 #### Use a parallelized cgenpp-function
 
 # generate random data
-rand_data(500,5000)
+rand_data(1000,10000)
 
 # check single-threaded performance
 system.time(W <- M\%c\%t(M))
 
-# set number of threads to the value reported by get_max_threads()
+# set number of threads to 2
 
-n_threads <- get_max_threads()
-set_num_threads(n_threads)
+set_num_threads(2)
 
 # check multi-threaded performance
 system.time(W <- M\%c\%t(M))

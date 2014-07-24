@@ -143,6 +143,8 @@ par_random = list(list(method="random",scale=var(y)/2,df=5),
 		  list(method="random",scale=var(y)/10,df=5))
 
 ### run 
+
+set_num_threads(1)
 fit <- clmm(y,random=random,par_random=par_random,niter=5000,burnin=2500)
 
 ### inspect results
