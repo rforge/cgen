@@ -1,8 +1,8 @@
-\name{cgen2-package}
-\alias{cgen2-package}
+\name{cgenpp-package}
+\alias{cgenpp-package}
 \docType{package}
 \title{
-cgen2 - Parallel genomic evaluations
+cgenpp - Parallel genomic evaluations
 }
 \description{
 The package offers a variety of functions that are frequently being used in genomic prediction
@@ -13,7 +13,7 @@ use of OpenMP.
 }
 \details{
 \tabular{ll}{
-Package: \tab cgen2\cr
+Package: \tab cgenpp\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2014-07-10\cr

@@ -1,22 +1,22 @@
 \name{Parallelization}
-\alias{cgen2-parallel}
+\alias{cgenpp-parallel}
 \docType{package}
 \title{
-Multithreading using \code{cgen2}
+Multithreading using \code{cgenpp}
 }
 \description{
-The package \code{cgen2} makes use of shared memory multi-threading using
+The package \code{cgenpp} makes use of shared memory multi-threading using
 OpenMP. R is of single-threaded nature, hence almost the entire package is written
 in C++. The package offers a variety of functions that lets you control and check
 the number of threads that are being used by the functions of the package.
-Internally every function uses the global variable \code{cgen2.threads} which is stored in
-\code{options()$cgen2.threads}.
+Internally every function uses the global variable \code{cgenpp.threads} which is stored in
+\code{options()$cgenpp.threads}.
 The value can be changed using the function \code{set_num_threads()}. When the package is loaded
-in an R-session \code{cgen2.threads} will be set to the value returned by \code{get_max_threads()} which
+in an R-session \code{cgenpp.threads} will be set to the value returned by \code{get_max_threads()} which
 is a wrapper for the OpenMP-header function \code{omp_get_max_threads()}}
 
 \details{
-The following functions are multithreaded and access the variable \code{cgen2.threads}:
+The following functions are multithreaded and access the variable \code{cgenpp.threads}:
 \itemize{
 \item{cGWAS}
 \item{cGWAS.emmax}

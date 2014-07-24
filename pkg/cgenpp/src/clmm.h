@@ -1,5 +1,5 @@
-#ifndef _cgen2_clmm_H
-#define _cgen2_clmm_H
+#ifndef _cgenpp_clmm_H
+#define _cgenpp_clmm_H
 
 #ifdef _OPENMP
   #define has_openmp 1

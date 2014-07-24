@@ -4,14 +4,14 @@
 #
 # Copyright (C)  2014 Claas Heuer
 #
-# This file is part of cgen2.
+# This file is part of cgenpp.
 #
-# cgen2 is free software: you can redistribute it and/or modify it
+# cgenpp is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# cgen2 is distributed in the hope that it will be useful, but
+# cgenpp is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -129,7 +129,7 @@ par_mcmc = list(niter=niter, burnin=burnin, full_output=TRUE, verbose=verbose, s
 if(verbose) { cat("Running Model\n") }
 set.seed(seed)
 #cat(paste("\n seed: ",seed,"\n",sep="")) 
- .Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cgen2.threads, PACKAGE = "cgen2" )[[1]]
+ .Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cgenpp.threads, PACKAGE = "cgenpp" )[[1]]
 
 #return(list(X=X,par_fixed=par_fixed,random=random,par_random=par_random,par_mcmc=par_mcmc))
 
@@ -248,7 +248,7 @@ par_mcmc = list(niter=niter, burnin=burnin, full_output=TRUE, verbose=FALSE, sca
 if(verbose) cat("Running Model\n")
 set.seed(seed)
 #cat(paste("\n seed: ",seed,"\n",sep="")) 
-.Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cgen2.threads, PACKAGE = "cgen2" )
+.Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cgenpp.threads, PACKAGE = "cgenpp" )
 
 #return(list(X=X,par_fixed=par_fixed,random=random,par_random=par_random,par_mcmc=par_mcmc))
 

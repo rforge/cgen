@@ -1,10 +1,10 @@
 \name{set_num_threads}
 \alias{set_num_threads}
 \title{
-Set the number of OpenMP threads used by the functions of package \code{cgen2}
+Set the number of OpenMP threads used by the functions of package \code{cgenpp}
 }
 \description{
-This function sets the value of the global variable stored in \code{options()$cgen2.threads} to the assigned integer.
+This function sets the value of the global variable stored in \code{options()$cgenpp.threads} to the assigned integer.
 Note: The assigned value may exceed the number of physical cores present but that might lead to dramatical
 decrease in performance.
 }
@@ -13,12 +13,12 @@ set_num_threads(x,silent=FALSE)
 }
 
 \arguments{
-\item{x}{Integer scalar that specifies the number of threads to be used by \code{cgen2}-functions}
+\item{x}{Integer scalar that specifies the number of threads to be used by \code{cgenpp}-functions}
 \item{silent}{boolean, controls whether to print a message}
 }
 
 \value{
-Changes the global variable \code{cgen2.threads} to the value in \code{x}
+Changes the global variable \code{cgenpp.threads} to the value in \code{x}
 }
 
 \seealso{\code{\link{get_num_threads}, \link{get_max_threads}, \link{check_openmp}}}
@@ -31,7 +31,7 @@ Changes the global variable \code{cgen2.threads} to the value in \code{x}
 \dontrun{
 set_num_threads(1)
 
-#### Use a parallelized cgen2-function
+#### Use a parallelized cgenpp-function
 
 # generate random data
 rand_data(500,5000)

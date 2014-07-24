@@ -1,10 +1,10 @@
 \name{get_num_threads}
 \alias{get_num_threads}
 \title{
-Get the number of threads for \code{cgen2}
+Get the number of threads for \code{cgenpp}
 }
 \description{
-Check the variable that specifies the number of threads being used by \code{cgen2}-functions
+Check the variable that specifies the number of threads being used by \code{cgenpp}-functions
 }
 \usage{
 get_num_threads()
@@ -12,7 +12,7 @@ get_num_threads()
 
 
 \value{
-Returns the value of the global variable \code{cgen2.threads}
+Returns the value of the global variable \code{cgenpp.threads}
 }
 
 \seealso{\code{\link{set_num_threads}, \link{get_max_threads}, \link{check_openmp}}}

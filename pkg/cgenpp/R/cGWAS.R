@@ -4,14 +4,14 @@
 #
 # Copyright (C)  2014 Claas Heuer
 #
-# This file is part of cgen2.
+# This file is part of cgenpp.
 #
-# cgen2 is free software: you can redistribute it and/or modify it
+# cgenpp is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# cgen2 is distributed in the hope that it will be useful, but
+# cgenpp is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -45,8 +45,8 @@ if(missing(V)) {
 second_transform=FALSE;
 V2 = array(1,dim=c(1,1))  	 
 
-#	 .Call( "cGWAS", y[isy], M[isy,], V[isy,isy], X[isy,], dom, sparse, threads, PACKAGE = "cgen2" )
-gwa <- .Call( "cGWAS", y, M, V, V2, X, dom, second_transform, sparse, verbose, options()$cgen2.threads, PACKAGE = "cgen2" )
+#	 .Call( "cGWAS", y[isy], M[isy,], V[isy,isy], X[isy,], dom, sparse, threads, PACKAGE = "cgenpp" )
+gwa <- .Call( "cGWAS", y, M, V, V2, X, dom, second_transform, sparse, verbose, options()$cgenpp.threads, PACKAGE = "cgenpp" )
 
 if(dom) { 
 
@@ -116,7 +116,7 @@ sparse=TRUE
 if(verbose) cat("\nRunning GWAS\n")
 second_transform=TRUE
 
-gwa<- .Call( "cGWAS", Uy, M, V, t(UD$vectors), UX, dom, second_transform, sparse,verbose, options()$cgen2.threads, PACKAGE = "cgen2" )
+gwa<- .Call( "cGWAS", Uy, M, V, t(UD$vectors), UX, dom, second_transform, sparse,verbose, options()$cgenpp.threads, PACKAGE = "cgenpp" )
 
 if(dom) { 
 

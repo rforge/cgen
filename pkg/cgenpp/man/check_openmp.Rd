@@ -12,7 +12,7 @@ check_openmp()
 
 
 \value{
-Returns a message telling you whether OpenMP is available for the \code{cgen2}-functions or not.
+Returns a message telling you whether OpenMP is available for the \code{cgenpp}-functions or not.
 }
 
 \seealso{\code{\link{set_num_threads}, \link{get_num_threads}, \link{get_max_threads}}}

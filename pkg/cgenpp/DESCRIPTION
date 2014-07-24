@@ -1,4 +1,4 @@
-Package: cgen2
+Package: cgenpp
 Type: Package
 Title: Parallel genomic evaluations
 Version: 1.0

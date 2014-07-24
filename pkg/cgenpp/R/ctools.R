@@ -4,14 +4,14 @@
 #
 # Copyright (C)  2014 Claas Heuer
 #
-# This file is part of cgen2.
+# This file is part of cgenpp.
 #
-# cgen2 is free software: you can redistribute it and/or modify it
+# cgenpp is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# cgen2 is distributed in the hope that it will be useful, but
+# cgenpp is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -25,7 +25,7 @@
 
 check_openmp <- function() {
 
-if(.Call("check_openmp",PACKAGE="cgen2")) 
+if(.Call("check_openmp",PACKAGE="cgenpp")) 
   { cat("OpenMP is available \n") } else {
       cat("OpenMP is NOT available \n")}
 
@@ -34,26 +34,26 @@ if(.Call("check_openmp",PACKAGE="cgen2"))
 
 # check_max_threads
 
-get_max_threads <- function() .Call("get_max_threads",PACKAGE="cgen2")
+get_max_threads <- function() .Call("get_max_threads",PACKAGE="cgenpp")
 
 # get_num_threads
 
-get_num_threads <- function() options()$cgen2.threads
+get_num_threads <- function() options()$cgenpp.threads
 
 # check_limit_threads
 
-#get_limit_threads <- function() .Call("get_limit_threads",PACKAGE="cgen2")
+#get_limit_threads <- function() .Call("get_limit_threads",PACKAGE="cgenpp")
 
 # set.threads
 
 set_num_threads <- function(x,silent=FALSE) {
 
-if(!.Call("check_openmp",PACKAGE="cgen2")) { if(!silent) cat("OpenMP is not available, threads set to 1 \n") } else {
+if(!.Call("check_openmp",PACKAGE="cgenpp")) { if(!silent) cat("OpenMP is not available, threads set to 1 \n") } else {
   if(length(x)!=1) stop("must be a scalar")
   t = as.integer(round(x,digits=0))
   if(t<=0) t=1
 
-  options(cgen2.threads=t)
+  options(cgenpp.threads=t)
   if(!silent) cat("Number of threads set to ",t,"\n")
   }
 
@@ -72,7 +72,7 @@ ccov <- function(X,lambda=0, w=NULL, cor=FALSE){
   if(lambda>1) lambda=1
   if(lambda<0) lambda=0
 
-  .Call( "ccov", X,lambda, as.numeric(w), as.integer(cor), options()$cgen2.threads, PACKAGE = "cgen2" )
+  .Call( "ccov", X,lambda, as.numeric(w), as.integer(cor), options()$cgenpp.threads, PACKAGE = "cgenpp" )
 
 }
 
@@ -95,7 +95,7 @@ csolve <- function(X,y=NULL){
 
  if(dim(X)[2]!=dim(y)[1]) {stop("ncol(X) doesn't match nrow(y)")}
 
- .Call( "csolve", X,y ,PACKAGE = "cgen2" )
+ .Call( "csolve", X,y ,PACKAGE = "cgenpp" )
 
 }
 
@@ -103,7 +103,7 @@ csolve <- function(X,y=NULL){
 # cscanx
 
 cscanx <- function(path){
-	.Call( "cscanx", path ,PACKAGE = "cgen2" )
+	.Call( "cscanx", path ,PACKAGE = "cgenpp" )
 }
 
 
@@ -116,7 +116,7 @@ cgrm.A <- function(X, lambda=0, yang=FALSE){
          if(any(is.na(X))) stop("No NAs allowed in X")
          if(lambda>1) lambda=1
          if(lambda<0) lambda=0        
-	 .Call( "camat", X, lambda, yang, options()$cgen2.threads ,PACKAGE = "cgen2" )
+	 .Call( "camat", X, lambda, yang, options()$cgenpp.threads ,PACKAGE = "cgenpp" )
 }
 
 # cgrm.D
@@ -126,7 +126,7 @@ cgrm.D <- function(X, lambda=0){
          if(any(is.na(X))) stop("No NAs allowed in X")
          if(lambda>1) lambda=1
          if(lambda<0) lambda=0
-	.Call( "cdmat", X, lambda, options()$cgen2.threads ,PACKAGE = "cgen2" )
+	.Call( "cdmat", X, lambda, options()$cgenpp.threads ,PACKAGE = "cgenpp" )
 }
 
 # cgrm
@@ -149,7 +149,7 @@ cgrm <- function(X, w = NULL, lambda=0){
          if(lambda>1) lambda=1
          if(lambda<0) lambda=0
 
-	 .Call( "cgrm", X, w,isw, lambda, options()$cgen2.threads ,PACKAGE = "cgen2" )
+	 .Call( "cgrm", X, w,isw, lambda, options()$cgenpp.threads ,PACKAGE = "cgenpp" )
 }
 
 
@@ -170,11 +170,11 @@ cgrm <- function(X, w = NULL, lambda=0){
  if(dim(X)[2]!=dim(Y)[1]) {stop("ncol(X) doesn't match nrow(Y)")}
 
  if(a == "matrix"){
-   if(b == "matrix") {.Call( "ccp_dense_dense", X,Y,options()$cgen2.threads ,PACKAGE = "cgen2" ) } 
-     else { .Call( "ccp_dense_sparse", X,Y,PACKAGE = "cgen2" ) } 
+   if(b == "matrix") {.Call( "ccp_dense_dense", X,Y,options()$cgenpp.threads ,PACKAGE = "cgenpp" ) } 
+     else { .Call( "ccp_dense_sparse", X,Y,PACKAGE = "cgenpp" ) } 
  } else {
-   if(b == "matrix") { .Call( "ccp_sparse_dense", X,Y,PACKAGE = "cgen2" ) }
-     else { .Call( "ccp_sparse_sparse", X,Y,PACKAGE = "cgen2" ) } 
+   if(b == "matrix") { .Call( "ccp_sparse_dense", X,Y,PACKAGE = "cgenpp" ) }
+     else { .Call( "ccp_sparse_sparse", X,Y,PACKAGE = "cgenpp" ) } 
  } 
  
 
@@ -241,7 +241,7 @@ return(cv_pheno) }
 # cmaf
 
 cmaf <- function(X)	{
-   maf <- .Call( "cmaf", X ,PACKAGE = "cgen2" )[1,]
+   maf <- .Call( "cmaf", X ,PACKAGE = "cgenpp" )[1,]
    maf[maf>0.5] = 1-maf[maf>0.5]
    return(maf)
 }
@@ -255,7 +255,7 @@ ccross <- function(X,D=NULL){
 	 if(missing(D)) { D = rep(1,ncol(X)) } else {
 	   if(!is.vector(D) | !is.numeric(D)) stop("D must be passed as a numeric vector") }
          if(length(D)!=ncol(X)) stop("vector D must have as many items as columns in X") 
-	 .Call( "ccross", X, D, options()$cgen2.threads, PACKAGE = "cgen2" )
+	 .Call( "ccross", X, D, options()$cgenpp.threads, PACKAGE = "cgenpp" )
 }
    
 
@@ -280,7 +280,7 @@ ccross <- function(X,D=NULL){
 
 ccolmv <- function(X,var=FALSE){
 
-     .Call( "ccolmv", X,var ,PACKAGE = "cgen2" )[1,]
+     .Call( "ccolmv", X,var ,PACKAGE = "cgenpp" )[1,]
 
 }
 
@@ -289,7 +289,7 @@ ccolmv <- function(X,var=FALSE){
 
 ctrace <- function(X){
  if(class(X)!="matrix"){stop("object must be of type 'matrix'")}
- .Call("ctrace",X,PACKAGE="cgen2")
+ .Call("ctrace",X,PACKAGE="cgenpp")
 }
 
 

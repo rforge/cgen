@@ -1,4 +1,4 @@
-useDynLib(cgen2)
+useDynLib(cgenpp)
 #exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
 import(Matrix)
