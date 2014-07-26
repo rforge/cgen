@@ -9,7 +9,7 @@ Both objects are independent and the only purpose is to test
 functions and show examples
 }
 \usage{
-rand_data(n,p_marker,h2=0.3,prop_qtl=0.01,seed=NULL)
+rand_data(n=500,p_marker=10000,h2=0.3,prop_qtl=0.01,seed=NULL)
 }
 
 \arguments{

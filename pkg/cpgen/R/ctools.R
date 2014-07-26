@@ -334,7 +334,7 @@ lsos <- function(..., n=10) {
 
 #### randmatrix
 
-rand_data <- function(n,p_marker,h2=0.3,prop_qtl=0.01,seed=NULL) { 
+rand_data <- function(n=500,p_marker=10000,h2=0.3,prop_qtl=0.01,seed=NULL) { 
 
 if(h2>1) h2 <- 2
 if(h2<0) h2 <- 0

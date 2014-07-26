@@ -21,7 +21,10 @@
 // <http://www.gnu.org/licenses/>.
 */
 
+#include "progress.hpp"
 #include "clmm.h"
+
+
 
 typedef vector<MCMC<base_methods_st> > mcmc_st;
 typedef vector<MCMC<base_methods_mp> > mcmc_mp;
@@ -42,6 +45,8 @@ Rcpp::List list_of_phenotypes(yR);
 int p = list_of_phenotypes.size();
 int index;
 
+Progress prog(p, verbose);
+
 mcmc_st vec_mcmc_st;
 mcmc_mp vec_mcmc_mp;
 
@@ -56,18 +61,21 @@ if((p>1) | (threads==1)) {
 
   }
 
-  if(verbose) { Rcout << endl << "Models finished:"; }
 
 // this looks easy - the work was to allow this step to be parallelized
 #pragma omp parallel for
   for(unsigned int i=0;i<vec_mcmc_st.size();i++){
 
-    vec_mcmc_st.at(i).gibbs();
-    if(verbose) { Rcout << endl  << i; }
+    if ( ! prog.is_aborted() ) {
+
+      vec_mcmc_st.at(i).gibbs();
+      prog.increment();
+
+    }
 
   }
 
-  if(verbose) { Rcout << endl; }
+
   Rcpp::List Summary;
   for(mcmc_st::iterator it = vec_mcmc_st.begin(); it != vec_mcmc_st.end(); it++) {
 

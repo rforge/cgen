@@ -129,7 +129,6 @@ if(missing(seed)) { seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) 
 par_mcmc = list(niter=niter, burnin=burnin, full_output=TRUE, verbose=verbose, scale_e = scale_e, df_e = df_e, seed = seed)
 
 
-if(verbose) { cat("Running Model\n") }
 set.seed(seed)
 #cat(paste("\n seed: ",seed,"\n",sep="")) 
  .Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cpgen.threads, PACKAGE = "cpgen" )[[1]]
@@ -248,8 +247,6 @@ if(missing(seed)) { seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) 
 
 par_mcmc = list(niter=niter, burnin=burnin, full_output=TRUE, verbose=FALSE, scale_e = scale_e, df_e = df_e, seed = seed)
 
-
-if(verbose) cat("Running Model\n")
 set.seed(seed)
 #cat(paste("\n seed: ",seed,"\n",sep="")) 
 .Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cpgen.threads, PACKAGE = "cpgen" )
