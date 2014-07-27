@@ -73,7 +73,7 @@ inline void DoProgress()
       if(pos == width) { 
 
         Rcpp::Rcout << std::endl; 
-        Rcpp::Rcout << "\r " << std::flush;
+        Rcpp::Rcout << "\r  " << std::flush;
         Rcpp::Rcout << std::endl; 
 
       }
