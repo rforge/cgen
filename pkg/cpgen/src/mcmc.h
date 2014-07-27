@@ -244,9 +244,8 @@ void MCMC<F>::gibbs() {
 
 vector<effects>::iterator it;  
 
-int progress = 0;
-printer prog(niter);
-
+  printer prog(niter);
+  if(verbose) { prog.initialize(); }
 
   for(int gibbs_iter=0; gibbs_iter<niter; gibbs_iter++){
 
@@ -293,8 +292,7 @@ printer prog(niter);
 
     if (verbose) {
 
-      progress++;
-      prog.DoProgress(progress);
+      prog.DoProgress();
 
     }
 

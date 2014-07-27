@@ -45,7 +45,6 @@ int p = list_of_phenotypes.size();
 int index;
 
 printer prog(p / threads);
-int progress = 0;
 
 mcmc_st vec_mcmc_st;
 mcmc_mp vec_mcmc_mp;
@@ -62,6 +61,8 @@ if((p>1) | (threads==1)) {
 
   }
 
+  if (p > 1) { prog.initialize(); }
+
 
 // this looks easy - the work was to allow this step to be parallelized
 #pragma omp parallel for 
@@ -71,14 +72,13 @@ if((p>1) | (threads==1)) {
 
 // verbose
 
-     if(p>1) {
+    if(p>1) {
 
       if(verbose) { 
    
         if(omp_get_thread_num()==0) {
 
-          progress++;
-          prog.DoProgress(progress); 
+          prog.DoProgress(); 
 
         }
 

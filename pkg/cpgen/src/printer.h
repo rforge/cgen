@@ -1,7 +1,6 @@
 #ifndef _PRINTER_H
 #define _PRINTER_H
 #include <stdio.h>
-#include <iomanip> 
 #include <Rcpp.h>
 
 
@@ -18,28 +17,28 @@ int pos;
 int previous_pos;
 int total;
 bool initialized;
-std::ostringstream oss;
-std::string position; 
+int progress;
+
 
 public:
 
-inline void DoProgress( int step)
+inline void DoProgress()
 {
 
+    if(!initialized) { initialize();}
 
+    progress++;
 
-    percent = ( step * 100 ) / total;
+    percent = ( progress * 100 ) / total;
 
     if(percent>100) { percent=100; }
 
     if(percent > previous_percent) {
 
-      if(!initialized) { init(); }
-
       fflush(stdout);
       previous_pos = pos;
-      pos = ( step * width ) / total;  
-      step = pos - previous_pos;
+      pos = ( progress * width ) / total;  
+      int step = pos - previous_pos;
 
       for ( int i = 0; i < step; i++ )  Rcpp::Rcout << "=";
 
@@ -56,24 +55,23 @@ inline void DoProgress( int step)
 
 };
 
-inline void init() {
+void initialize() {
 
 
-//cout << "\033[1G" << n*10 << "\033[5G" << flush;
 
       Rcpp::Rcout << std::endl << "[";
 
-      //fill progress bar with =
+      //fill progress bar 
       for ( int i = 0; i < width; i++ )  Rcpp::Rcout << " ";
 
       Rcpp::Rcout << "]" << " " << "0%"<< "\033[2G" <<  std::flush;
 
-      initialized = 1;
+      initialized = true;
 
 };
 
 
-printer(int t) : total(t), pos(0), previous_pos(0), previous_percent(0), initialized(0) {} 
+printer(int t) : total(t), pos(int()), previous_pos(int()), previous_percent(int()), initialized(false), progress(int()) {} 
 
 
 

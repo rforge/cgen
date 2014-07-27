@@ -21,7 +21,7 @@ Equivalent solutions are obtained by premultiplying the design matrix \eqn{\math
 
 
 \usage{
-cGWAS(y,M,X=NULL,V=NULL,dom=FALSE, verbose=TRUE)
+cGWAS(y,M,X=NULL,V=NULL,dom=FALSE, verbose=FALSE)
 }
 \arguments{
 \item{y}{vector of phenotypes}

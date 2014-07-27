@@ -13,7 +13,7 @@ The random effect \eqn{\mathbf{a}} follows some covariance-structure \eqn{\mathb
 
 \usage{
 cGBLUP(y,G,X=NULL, scale_a = 0, df_a = -2, scale_e = 0, df_e = -2,
-          niter = 10000, burnin = 5000, seed = NULL, verbose=TRUE)
+          niter = 10000, burnin = 5000, seed = NULL, verbose=FALSE)
 }
 \arguments{
 \item{y}{vector of phenotypes}

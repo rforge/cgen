@@ -17,7 +17,7 @@ that random effect as described in Waldmann et al. (2008): \eqn{\mathbf{F} = \ma
 
 \usage{
 clmm(y, X = NULL , random = NULL, par_random = NULL, niter=10000, 
-burnin=5000,scale_e=0,df_e=-2, verbose = TRUE, seed = NULL)
+burnin=5000,scale_e=0,df_e=-2, verbose = FALSE, seed = NULL)
 }
 \arguments{
 \item{y}{vector of phenotypes}

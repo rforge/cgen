@@ -147,7 +147,7 @@ MapMatrixXd V2 = MapMatrixXd(as<MapMatrixXd> (V2_R));
   int n_threads = omp_get_num_threads();
   int max = M.cols() / n_threads;
   printer prog(max);
-  int progress = 0;
+
   
 
 
@@ -187,8 +187,7 @@ MapMatrixXd V2 = MapMatrixXd(as<MapMatrixXd> (V2_R));
 
       if (verbose) {
 
-        progress++;
-        prog.DoProgress(progress);
+        prog.DoProgress();
 
       }
 

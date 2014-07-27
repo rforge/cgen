@@ -23,7 +23,7 @@
 
 # cGWAS
 
-cGWAS <- function(y,M,X=NULL,V=NULL,dom=FALSE, verbose=TRUE){
+cGWAS <- function(y,M,X=NULL,V=NULL,dom=FALSE, verbose=FALSE){
 
 id = 1:length(y)
 isy = id[!is.na(y)]
@@ -70,7 +70,7 @@ return(gwa)
 
 # cGWAS.emmax
 
-cGWAS.emmax <- function(y,M,A=NULL,X=NULL,dom=FALSE,verbose=TRUE,scale_a = 0, df_a = -2, scale_e = 0, df_e = -2,niter=15000,burnin=7500,seed=NULL){
+cGWAS.emmax <- function(y,M,A=NULL,X=NULL,dom=FALSE,verbose=FALSE,scale_a = 0, df_a = -2, scale_e = 0, df_e = -2,niter=15000,burnin=7500,seed=NULL){
 
 id = 1:length(y)
 isy = id[!is.na(y)]
