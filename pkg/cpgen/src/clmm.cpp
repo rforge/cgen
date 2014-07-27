@@ -21,10 +21,8 @@
 // <http://www.gnu.org/licenses/>.
 */
 
-#include "progress.hpp"
 #include "clmm.h"
-
-
+#include "printer.h"
 
 typedef vector<MCMC<base_methods_st> > mcmc_st;
 typedef vector<MCMC<base_methods_mp> > mcmc_mp;
@@ -34,6 +32,7 @@ SEXP clmm(SEXP yR, SEXP XR, SEXP par_XR, SEXP list_of_design_matricesR, SEXP par
 
 int threads = as<int>(threadsR); 
 int verbose = as<int>(verboseR); 
+
 
 //omp_set_dynamic(0);
 omp_set_num_threads(threads);
@@ -45,10 +44,12 @@ Rcpp::List list_of_phenotypes(yR);
 int p = list_of_phenotypes.size();
 int index;
 
-Progress prog(p, verbose);
+printer prog(p / threads);
+int progress = 0;
 
 mcmc_st vec_mcmc_st;
 mcmc_mp vec_mcmc_mp;
+
 
 if((p>1) | (threads==1)) {
 
@@ -63,13 +64,25 @@ if((p>1) | (threads==1)) {
 
 
 // this looks easy - the work was to allow this step to be parallelized
-#pragma omp parallel for
+#pragma omp parallel for 
   for(unsigned int i=0;i<vec_mcmc_st.size();i++){
 
-    if ( ! prog.is_aborted() ) {
+    vec_mcmc_st.at(i).gibbs();
 
-      vec_mcmc_st.at(i).gibbs();
-      prog.increment();
+// verbose
+
+     if(p>1) {
+
+      if(verbose) { 
+   
+        if(omp_get_thread_num()==0) {
+
+          progress++;
+          prog.DoProgress(progress); 
+
+        }
+
+      }
 
     }
 
@@ -84,7 +97,7 @@ if((p>1) | (threads==1)) {
 
   }
 
-      return Summary;
+  return Summary;
 
 } else {
 
@@ -108,6 +121,7 @@ if((p>1) | (threads==1)) {
       Summary[it->get_name()] = it->get_summary();     
 
     }
+
 
     return Summary;
 

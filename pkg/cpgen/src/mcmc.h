@@ -42,6 +42,7 @@ typedef std::vector<std::map<std::string, int> > mp_container;
 
 #include "mt_sampler.h"
 #include "effects.h"
+#include "printer.h"
 
 ////////////////
 // MCMC class //
@@ -243,6 +244,9 @@ void MCMC<F>::gibbs() {
 
 vector<effects>::iterator it;  
 
+int progress = 0;
+printer prog(niter);
+
 
   for(int gibbs_iter=0; gibbs_iter<niter; gibbs_iter++){
 
@@ -287,11 +291,18 @@ vector<effects>::iterator it;
 
     }
 
-    if(verbose) { Rcout << endl << "Iteration: " << gibbs_iter << "   s2e: " << var_e; }
+    if (verbose) {
+
+      progress++;
+      prog.DoProgress(progress);
+
+    }
+
+//    if(verbose) { Rcout << endl << "Iteration: " << gibbs_iter << "   s2e: " << var_e; }
 
   }
 
-  if(verbose) { Rcout << endl; }
+//  if(verbose) { Rcout << endl; }
 
 
 }

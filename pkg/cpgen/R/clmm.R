@@ -128,7 +128,6 @@ if(missing(seed)) { seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) 
 
 par_mcmc = list(niter=niter, burnin=burnin, full_output=TRUE, verbose=verbose, scale_e = scale_e, df_e = df_e, seed = seed)
 
-
 set.seed(seed)
 #cat(paste("\n seed: ",seed,"\n",sep="")) 
  .Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cpgen.threads, PACKAGE = "cpgen" )[[1]]
@@ -247,6 +246,7 @@ if(missing(seed)) { seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) 
 
 par_mcmc = list(niter=niter, burnin=burnin, full_output=TRUE, verbose=FALSE, scale_e = scale_e, df_e = df_e, seed = seed)
 
+
 set.seed(seed)
 #cat(paste("\n seed: ",seed,"\n",sep="")) 
 .Call("clmm",y, X , par_fixed ,random, par_random ,par_mcmc, verbose=verbose, options()$cpgen.threads, PACKAGE = "cpgen" )
@@ -286,7 +286,7 @@ cGBLUP <- function(y,G,X=NULL, scale_a = 0, df_a = -2, scale_e = 0, df_e = -2,ni
 
 isy <- (1:length(y))[!is.na(y)]
 
-if(verbose) cat("Computing Eigen Decomposition\n")
+if(verbose) cat("\nComputing Eigen Decomposition\n")
 
 if(length(isy) < length(y)) {
   UD <- eigen(G[isy,isy]) } else {

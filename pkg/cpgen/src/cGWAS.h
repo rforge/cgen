@@ -33,7 +33,7 @@
 #else 
   #define omp_set_num_threads(x) 1
 #endif
-
+#include "printer.h"
 
 
 using namespace Rcpp;
@@ -122,8 +122,6 @@ MapMatrixXd M = MapMatrixXd(as<MapMatrixXd> (M_R));
 T V = T(as<T> (V_R));
 MapMatrixXd V2 = MapMatrixXd(as<MapMatrixXd> (V2_R));
 
-if(verbose) {Rcout << endl << "Markers done:";}
-
 
 #pragma omp parallel
 {
@@ -146,8 +144,11 @@ if(verbose) {Rcout << endl << "Markers done:";}
   xty.segment(0,Xstar.cols()) = Xstar.transpose()*ystar;
 
 // for verbose
-  int progress = 0;
   int n_threads = omp_get_num_threads();
+  int max = M.cols() / n_threads;
+  printer prog(max);
+  int progress = 0;
+  
 
 
 #pragma omp for
@@ -183,17 +184,25 @@ if(verbose) {Rcout << endl << "Markers done:";}
 
 
     if(omp_get_thread_num()==0) {
-        if(verbose) { 
-          progress++;
-          if ( progress*n_threads % 1000 == 0 ) { 
-            Rcout << endl << progress*n_threads; 
-          }
-        }
-      }  
+
+      if (verbose) {
+
+        progress++;
+        prog.DoProgress(progress);
+
+      }
 
     }
 
-  if(verbose) { if(omp_get_thread_num()==0) { Rcout << endl << endl; } }
+
+//    if(omp_get_thread_num()==0) {
+//        if(verbose) { 
+//          progress++;
+//          DoProgress(progress*n_threads, M.cols() );
+//        }
+//      }  
+
+    }
 
   }
 
