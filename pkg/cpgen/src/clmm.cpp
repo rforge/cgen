@@ -61,7 +61,7 @@ if((p>1) | (threads==1)) {
 
   }
 
-  if (p > 1) { prog.initialize(); }
+  if ((p > 1) & verbose) { prog.initialize(); }
 
 
 // this looks easy - the work was to allow this step to be parallelized

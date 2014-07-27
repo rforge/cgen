@@ -13,7 +13,7 @@ using \code{\link{clmm}}. This method was termed EMMAX (Kang et al., 2010).
 
 
 \usage{
-cGWAS.emmax(y,M,A=NULL,X=NULL,dom=FALSE,verbose=FALSE,scale_a = 0, df_a = -2,
+cGWAS.emmax(y,M,A=NULL,X=NULL,dom=FALSE,verbose=TRUE,scale_a = 0, df_a = -2,
 		   scale_e = 0, df_e = -2,niter=15000,burnin=7500,seed=NULL)
 }
 \arguments{
