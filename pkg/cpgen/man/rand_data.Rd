@@ -4,7 +4,7 @@
 Generate random data for test purposes
 }
 \description{
-Generates a random marker-matrix in -1,0,1 coding and a phenotype vector.
+Generates a random marker-matrix in \{-1,0,1\} coding and a phenotype vector.
 Both objects are independent and the only purpose is to test 
 functions and show examples
 }
