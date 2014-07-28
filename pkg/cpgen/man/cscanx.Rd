@@ -22,7 +22,7 @@ Matrix shaped as in the file
 \examples{
 
 # random matrix
-X <- matrix(rnorm(10,5),10,5)
+X <- matrix(rnorm(10*5),10,5)
 
 # write that matrix to a file
 write.table(X,file="X",col.names=FALSE,row.names=FALSE,quote=FALSE)
