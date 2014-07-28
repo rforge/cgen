@@ -57,7 +57,7 @@ inline void DoProgress()
       std::ostringstream oss;
       oss << percent;
 
-      message="[";
+      message=" [";
       for(int i=0;i<pos;i++) { message.append("="); }
       for(int i=0;i<width-pos;i++)  {message.append(" "); }
       message.append("] ");
@@ -87,7 +87,7 @@ void initialize() {
 
 
 
-      Rcpp::Rcout << std::endl << "[";
+      Rcpp::Rcout << std::endl << " [";
 
       //fill progress bar 
       for ( int i = 0; i < width; i++ )  Rcpp::Rcout << " ";
