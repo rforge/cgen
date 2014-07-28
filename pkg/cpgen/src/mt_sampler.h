@@ -24,6 +24,8 @@
 #include <iostream>
 #include <random>
 
+// source: http://www.cplusplus.com/reference/random/mersenne_twister_engine/seed/
+
 class sampler {
 
 private:
@@ -42,20 +44,40 @@ public:
 
   };
 
-  void set_seed(uint32_t seed){
 
-  gen.seed(static_cast<uint32_t> (seed));
+
+  void set_seed(std::string string_seed){
+
+  std::seed_seq my_seed(string_seed.begin(),string_seed.end());
+  gen.seed(my_seed);
 
   };
 
+
+// not nice
   void set_seed(){
 
   std::random_device rd;
-  gen = std::mt19937(static_cast<uint32_t> (rd())); 
+  gen.seed(static_cast<uint32_t> (rd())); 
 
   };
 
   void check_sampler(){ std::cout << std::endl << " I am mt19937_C++ " << std::endl;};
+
+  sampler() {
+
+  std::random_device rd;
+  gen = std::mt19937(static_cast<uint32_t> (rd())); 
+
+  }
+
+  sampler(std::string string_seed) {
+
+  std::seed_seq my_seed(string_seed.begin(),string_seed.end());
+  gen = std::mt19937(my_seed);
+
+  }
+
 
 };
 

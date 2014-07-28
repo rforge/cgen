@@ -340,7 +340,8 @@ if(h2>1) h2 <- 2
 if(h2<0) h2 <- 0
 if(prop_qtl > 1) prop_qtl <- 1
 if(prop_qtl < 0) prop_qtl <- 0
-if(!missing(seed)) set.seed(seed)
+if(missing(seed)) { seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) %% 2^31) }
+set.seed(seed)
 
 ### generate random data
 nindividuals = n

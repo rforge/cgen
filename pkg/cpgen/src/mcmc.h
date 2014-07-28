@@ -81,7 +81,7 @@ public:
 
   int n;
 
-  uint32_t seed;
+  std::string seed;
  
   std::string name;
 
@@ -129,11 +129,15 @@ void MCMC<F>::populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP
   scale_e = Rcpp::as<double>(par["scale_e"]);
   df_e = Rcpp::as<double>(par["df_e"]);
 
-  seed = Rcpp::as<uint32_t>(par["seed"]);
+  seed = Rcpp::as<std::string>(par["seed"]);
 
   std::ostringstream oss; 
   oss << phenotype_number + 1; 
   name = "PHENOTYPE_" + oss.str();
+
+// this is to ensure that if a couple of models are run at the same time
+// that every instance has got a unique seed - openmp
+  seed.append(oss.str());
 
   list_of_design_matrices = Rcpp::List(list_of_design_matrices_from_R);
   MapVectorXd y_temp = MapVectorXd(as<MapVectorXd> (y_from_R));
@@ -218,7 +222,7 @@ for(int i=0;i<n_threads;i++) {
 
  initialized=0;
 
- mcmc_sampler.set_seed(seed+phenotype_number);
+ mcmc_sampler.set_seed(seed);
 
 //  Rcout << endl << "MCMC I am single_thread" << endl;
 
