@@ -21,6 +21,10 @@
 // <http://www.gnu.org/licenses/>.
 */
 
+
+// default copy constructor is enough. it will call base and the only data
+// member is 'design_matrix' which copy-constructor is being called (Eigen).
+
 #include "function_base.h"
 
 

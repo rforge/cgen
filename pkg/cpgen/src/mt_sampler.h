@@ -29,18 +29,18 @@
 class sampler {
 
 private:
-  std::mt19937 * gen;
+  std::mt19937 gen;
 
 public:
   double rnorm(double mean, double sd){
 
-    return std::normal_distribution<double>(mean,sd)(*gen);
+    return std::normal_distribution<double>(mean,sd)(gen);
 
   };
 
   double rchisq(int df){
 
-    return std::chi_squared_distribution<double>(df)(*gen);
+    return std::chi_squared_distribution<double>(df)(gen);
 
   };
 
@@ -49,7 +49,7 @@ public:
   void set_seed(std::string string_seed){
 
   std::seed_seq my_seed(string_seed.begin(),string_seed.end());
-  gen->seed(my_seed);
+  gen.seed(my_seed);
 
   };
 
@@ -58,7 +58,7 @@ public:
   void set_seed(){
 
   std::random_device rd;
-  gen->seed(static_cast<uint32_t> (rd())); 
+  gen.seed(static_cast<uint32_t> (rd())); 
 
   };
 
@@ -67,7 +67,7 @@ public:
   sampler() {
 
   std::random_device rd;
-  gen = new std::mt19937(static_cast<uint32_t> (rd())); 
+  gen = std::mt19937(static_cast<uint32_t> (rd())); 
 
   }
 
@@ -75,11 +75,11 @@ public:
 
   std::seed_seq my_seed(string_seed.begin(),string_seed.end());
  // cout << endl << my_seed << endl;
-  gen = new std::mt19937(my_seed);
+  gen = std::mt19937(my_seed);
 
   }
 
-  ~sampler(){ delete gen; }
+//  ~sampler(){ delete gen; }
 
 
 };

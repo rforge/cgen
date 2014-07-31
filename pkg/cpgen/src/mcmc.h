@@ -54,9 +54,7 @@ class MCMC {
 private:
 
   int niter;
-  int iter;
   int  burnin;
-  int  p;
   bool full_output;
   bool verbose;
   bool initialized;
@@ -69,10 +67,12 @@ private:
 public:
 
   Rcpp::List list_of_design_matrices;
+  SEXP X_design_matrix;
   Rcpp::List summary_list;
+  Rcpp::List par_fixed;
+  Rcpp::List par_random;
+
   double var_y;
-  double mu_y;
-  double var_beta;
   double post_var_e;
   double mu;
  
@@ -101,7 +101,7 @@ public:
   bool has_na;
   vector<int> isna;
 
-  void populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number);
+//  void populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number);
   inline void initialize();
   inline void sample_random();
   inline void sample_residual();
@@ -112,15 +112,23 @@ public:
   Rcpp::List get_summary();
 // taken from http://stackoverflow.com/questions/307082/cleaning-up-an-stl-list-vector-of-pointers
 //  ~MCMC() { while(!model_effects.empty()) delete model_effects.back(), model_effects.pop_back() ;};
-  MCMC() : my_base_functions(new F) {};
+//  MCMC() : my_base_functions(new F) {};
+   MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, 
+   SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number);
+//   MCMC(const MyString& mcmc_source);
   ~MCMC(){ delete my_base_functions; };
 
 };
 
 template<class F>
-void MCMC<F>::populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number) {
+MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number) : my_base_functions(0)  {
 
+
+// Initializing all members
   Rcpp::List par(par_from_R);
+  list_of_design_matrices = Rcpp::List(list_of_design_matrices_from_R);
+  X_design_matrix = X_from_R;
+  MapVectorXd y_temp = MapVectorXd(as<MapVectorXd> (y_from_R));
 
   niter = Rcpp::as<int>(par["niter"]);
   burnin = Rcpp::as<int>(par["burnin"]);
@@ -128,8 +136,10 @@ void MCMC<F>::populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP
   verbose = Rcpp::as<bool>(par["verbose"]);
   scale_e = Rcpp::as<double>(par["scale_e"]);
   df_e = Rcpp::as<double>(par["df_e"]);
-
   seed = Rcpp::as<std::string>(par["seed"]);
+
+  par_fixed = Rcpp::List(par_fixed_from_R);
+  par_random = Rcpp::List(par_design_matrices_from_R);
 
   std::ostringstream oss; 
   oss << phenotype_number + 1; 
@@ -138,16 +148,16 @@ void MCMC<F>::populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP
 // this is to ensure that if a couple of models are run at the same time
 // that every instance has got a unique seed - openmp
   seed.append(oss.str());
+  mcmc_sampler = sampler(seed);
+//  my_base_functions = new F;
 
-  list_of_design_matrices = Rcpp::List(list_of_design_matrices_from_R);
-  MapVectorXd y_temp = MapVectorXd(as<MapVectorXd> (y_from_R));
   y = y_temp;
+  ycorr = y;
 
   mean_var_e = VectorXd::Zero(niter);
 
   effiter=0;
   post_var_e=0;
-  iter=0;
 
   n = y.size();
   n_random = list_of_design_matrices.size() -1;
@@ -158,6 +168,86 @@ void MCMC<F>::populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP
 
   has_na=0;
   mu = 0;
+  var_y=0;
+  isna = vector<int>();
+  model_effects = vector<effects>();
+  initialized = false;
+
+}
+
+
+
+/*
+
+///////////////////////
+// Copy Constructor ///
+//////////////////////
+
+template<class F>
+MCMC<F>::MCMC(const MyString& mcmc_source) {
+
+  niter = mcmc_source.niter;
+  burnin = mcmc_source.burnin;
+  full_output = mcmc_source.full_output;
+  verbose = mcmc_source.verbose;
+  initialized = mcmc_source.initialized;
+  scale_e = mcmc_source.scale_e;
+  df_e = mcmc_source.df_e;
+
+// default copy constructor of class 'sampler' is sufficent (no dynamic objects)
+  mcmc_sampler = mcmc_source.mcmc_sampler;
+
+
+  list_of_design_matrices = mcmc_source.list_of_design_matrices;
+  summary_list = mcmc_source.summary_list;
+  var_y = mcmc_source.var_y;
+  post_var_e = mcmc_source.post_var_e;
+  mu = mcmc_source.mu;
+ 
+  effiter = mcmc_source.effiter;
+  n_random = mcmc_source.n_random;
+
+  n = mcmc_source.n;
+
+  seed = mcmc_source.seed;
+ 
+  name = mcmc_source.name;
+
+  y = mcmc_source.y;
+  ycorr = mcmc_source.ycorr;
+  mean_var_e = mcmc_source.mean_var_e;
+
+  thread_vec = mcmc_source.thread_vec;
+
+// First reason for explicit copy constructor
+  my_base_functions = new base_methods_abstract(*mcmc_source.my_base_functions);
+
+// FIXME check this
+  vector<effects> model_effects;
+
+  var_e = mcmc_source.var_e;
+
+  has_na = mcmc_source.has_na;
+  isna = mcmc_source.isna;
+
+}
+
+*/
+
+
+template<class F>
+void MCMC<F>::initialize() {
+
+// here we assing the base_function class outside
+// the destructor to prevend the nightmare of having to 
+// code copy constructures for every single virtual and 
+// derived class
+
+  delete my_base_functions;
+
+  my_base_functions = new F; 
+
+  isna.clear();
 
   for(int i=0;i<y.size();i++) { if( y(i)!=y(i) ){ isna.push_back(i);} else { mu+=y(i);} }
 //Rcout << endl << "na size: " << isna.size() << endl;
@@ -171,7 +261,7 @@ void MCMC<F>::populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP
   var_y = var_y / (y.size() - isna.size() - 1);
   var_e = var_y - (var_y / (2 * n_random));
 
-  ycorr = y;
+
 
 /////////////////////
 // Multithreading //
@@ -187,7 +277,7 @@ if(omp_get_thread_num()==0) { n_threads = omp_get_num_threads(); }
 }
 
 
-thread_vec.resize(n_threads);
+thread_vec = mp_container(n_threads);
 
 
 for(int i=0;i<n_threads;i++) {
@@ -200,39 +290,33 @@ for(int i=0;i<n_threads;i++) {
 }
 
 
-
 // populate with effects
 // include fixed effect
 
-  Rcpp::List par_fixed(par_fixed_from_R);
-  model_effects.push_back(effects(X_from_R, ycorr.data(),par_fixed, &var_e, var_y,n_random,niter, burnin, full_output)); 
+  model_effects.clear();
+  model_effects.push_back(effects(X_design_matrix, ycorr.data(),par_fixed, &var_e, var_y,n_random,niter, burnin, full_output)); 
 
 // random effects
 
-  Rcpp::List par_design_matrices(par_design_matrices_from_R);
-
   for(int i=0;i<list_of_design_matrices.size();i++){
 
-    SEXP temp_list_sexp = par_design_matrices[i];
+    SEXP temp_list_sexp = par_random[i];
+
     Rcpp::List temp_list(temp_list_sexp);
 
     model_effects.push_back(effects(list_of_design_matrices[i],ycorr.data(),temp_list, &var_e, var_y,n_random,niter, burnin, full_output)); 
 
   }
 
- initialized=0;
 
- mcmc_sampler.set_seed(seed);
+
 
 //  Rcout << endl << "MCMC I am single_thread" << endl;
 
 
-}
 
 
-template<class F>
-void MCMC<F>::initialize() {
-
+// initializing effects
 
     for(vector<effects>::iterator it = model_effects.begin(); it != model_effects.end(); it++) {
 
@@ -240,11 +324,15 @@ void MCMC<F>::initialize() {
 
     }
 
+    initialized = true;
+
 }
 
 
 template<class F>
 void MCMC<F>::gibbs() {
+
+if(!initialized) initialize();
 
 vector<effects>::iterator it;  
 
