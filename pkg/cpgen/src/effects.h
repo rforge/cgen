@@ -36,7 +36,6 @@ public:
 
   SEXP design_matrix;
   int total_number_effects;
-  int my_number;
   int columns;
   int niter;
   int burnin;
@@ -54,9 +53,7 @@ public:
   std::string sparse_or_dense;
   std::string method;
   bool initialized;
-  bool sparse;
   bool full_output;
-  double rhs,lhs;
   double var_y;
   VectorXd estimates;
   VectorXd mean_estimates;
@@ -69,7 +66,7 @@ public:
   inline Eigen::VectorXd predict(int effiter);
   Rcpp::List get_summary(int effiter);
 
-  effects(){my_functions=0;};
+  effects() : my_functions(0){};
 // deleting the null-pointer does nothing, so we dont have to check whether a new function class has been assigned
 // but if: it will be deleted
   ~effects() {delete my_functions;};
@@ -79,7 +76,7 @@ public:
 };
 
 
-effects::effects(SEXP design_matrix_from_MCMC, double * ycorr_from_MCMC, Rcpp::List list_from_MCMC, double * var_e_from_MCMC, double var_y_from_MCMC,int total_number_effects_from_MCMC,int niter_from_MCMC, int burnin_from_MCMC, bool full_output_from_MCMC){
+effects::effects(SEXP design_matrix_from_MCMC, double * ycorr_from_MCMC, Rcpp::List list_from_MCMC, double * var_e_from_MCMC, double var_y_from_MCMC,int total_number_effects_from_MCMC,int niter_from_MCMC, int burnin_from_MCMC, bool full_output_from_MCMC) : my_functions(0) {
  
   design_matrix = design_matrix_from_MCMC;
   scale = as<double>(list_from_MCMC["scale"]);
@@ -93,7 +90,9 @@ effects::effects(SEXP design_matrix_from_MCMC, double * ycorr_from_MCMC, Rcpp::L
   full_output = full_output_from_MCMC;
   niter = niter_from_MCMC;
   burnin = burnin_from_MCMC;
-  my_functions = 0;
+
+  initialized = false;
+
 
 //  Rcout << endl << "effects I am single_thread" << endl;
 
@@ -120,7 +119,7 @@ void effects::initialize(base_methods_abstract*& base_fun){
   estimates = VectorXd::Zero(columns);
   mean_estimates = VectorXd::Zero(columns);
   var_posterior.resize(niter);
-  initialized = 1;
+  initialized = true;
   
 
 }
