@@ -152,7 +152,6 @@ MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_
 //  my_base_functions = new F;
 
   y = y_temp;
-  ycorr = y;
 
   mean_var_e = VectorXd::Zero(niter);
 
@@ -166,7 +165,7 @@ MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_
 // check for NAs in pehnotype vector
 // comparison x!=x yields TRUE if x=NA
 
-  has_na=0;
+  has_na = true;
   mu = 0;
   var_y=0;
   isna = vector<int>();
@@ -247,21 +246,21 @@ void MCMC<F>::initialize() {
 
   my_base_functions = new F; 
 
-  isna.clear();
+//  isna.clear();
 
   for(int i=0;i<y.size();i++) { if( y(i)!=y(i) ){ isna.push_back(i);} else { mu+=y(i);} }
 //Rcout << endl << "na size: " << isna.size() << endl;
-  if(isna.size() > 0) { has_na=1;}
+  has_na = isna.size() > 0 ? true : false;
 
   mu = mu / (y.size() - isna.size());  
 
 // compute variance; missing at random for NAs -- FIXME crucial part
 // FIXME assign: if( y(i)!=y(i)  or if( y(i)!=0 ??
-  for(int i=0;i<y.size();i++) { if( y(i)!=y(i) ) {y(i) = 0;} else {var_y += (y(i) - mu) * (y(i) - mu);} }
+  for(int i=0;i<y.size();i++) { if( y(i)!=y(i) ) {y(i) = mu;} else {var_y += (y(i) - mu) * (y(i) - mu);} }
   var_y = var_y / (y.size() - isna.size() - 1);
   var_e = var_y - (var_y / (2 * n_random));
 
-
+  ycorr = y;
 
 /////////////////////
 // Multithreading //
