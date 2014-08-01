@@ -113,6 +113,7 @@ cscanx <- function(path){
 
 cgrm.A <- function(X, lambda=0, yang=FALSE){
 
+         if(class(X)!=matrix) stop("X must be an object of class 'matrix')
          if(any(is.na(X))) stop("No NAs allowed in X")
          if(lambda>1) lambda=1
          if(lambda<0) lambda=0        
@@ -123,6 +124,7 @@ cgrm.A <- function(X, lambda=0, yang=FALSE){
 
 cgrm.D <- function(X, lambda=0){
 
+         if(class(X)!=matrix) stop("X must be an object of class 'matrix')
          if(any(is.na(X))) stop("No NAs allowed in X")
          if(lambda>1) lambda=1
          if(lambda<0) lambda=0
@@ -133,6 +135,7 @@ cgrm.D <- function(X, lambda=0){
 
 cgrm <- function(X, w = NULL, lambda=0){
 
+         if(class(X)!=matrix) stop("X must be an object of class 'matrix')
          if(any(is.na(X))) stop("No NAs allowed in X")
          isw = TRUE
 	 if(missing(w)) {w = rep(1,ncol(X)); isw = FALSE} else {
