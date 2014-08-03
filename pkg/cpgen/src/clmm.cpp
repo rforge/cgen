@@ -40,7 +40,6 @@ Eigen::initParallel();
 
 Rcpp::List list_of_phenotypes(yR);
 int p = list_of_phenotypes.size();
-int index;
 
 printer prog(p / threads);
 
