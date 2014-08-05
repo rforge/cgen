@@ -29,6 +29,11 @@
 SEXP check_openmp() { return wrap(has_openmp); }
 
 
+// check openmp_version
+
+SEXP check_openmp_version() { return wrap(OMP_VERSION); }
+
+
 // check_max_threads
 
 SEXP get_max_threads(){ return wrap(omp_get_max_threads()); } 

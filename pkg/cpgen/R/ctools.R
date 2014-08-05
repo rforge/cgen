@@ -25,9 +25,14 @@
 
 check_openmp <- function() {
 
-if(.Call("check_openmp",PACKAGE="cpgen")) 
-  { cat("OpenMP is available \n") } else {
-      cat("OpenMP is NOT available \n")}
+if(.Call("check_openmp",PACKAGE="cpgen")) {
+  
+  ver = .Call("check_openmp_version",PACKAGE="cpgen")
+  cat("OpenMP is available - Version: ",ver,"\n") 
+
+} else {
+      cat("OpenMP is NOT available \n")
+  }
 
 } 
 

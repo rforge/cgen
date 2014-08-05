@@ -29,6 +29,7 @@
 #ifdef _OPENMP
   #define has_openmp 1
   #include <omp.h>
+  #define OMP_VERSION _OPENMP
 #else 
   #define has_openmp 0
   #define omp_get_num_threads() 1
@@ -37,6 +38,7 @@
   #define omp_get_thread_limit() 1
   #define omp_set_dynamic(x) 1
   #define omp_get_thread_num() 0
+  #define OMP_VERSION 0
 #endif
 
 using namespace Rcpp;
@@ -66,6 +68,7 @@ SEXP ccrossproduct(SEXP XR, SEXP ZR)
 
 
 RcppExport SEXP check_openmp();
+RcppExport SEXP check_openmp_version();
 RcppExport SEXP get_max_threads();
 //RcppExport SEXP get_limit_threads();
 
