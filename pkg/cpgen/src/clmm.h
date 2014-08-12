@@ -16,7 +16,7 @@
 
 #include <RcppEigen.h>
 #include <vector>
-#include "mcmc.h"
+#include "clmm/mcmc.h"
 
 
 RcppExport SEXP clmm(SEXP yR, SEXP XR, SEXP par_XR, SEXP list_of_design_matricesR, SEXP par_design_matricesR, SEXP par_mcmcR, SEXP verboseR, SEXP threadsR);
