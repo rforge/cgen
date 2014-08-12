@@ -39,7 +39,7 @@
 //    This is implemented using the base class in 'function_base.h' from which 
 //    , as of now, three classes inherit ('functions.h').
 // 3) Sparse or dense design matrices.
-//    This achieved by explicetly specializing the functions in 'base_methods.h' for the two classes:
+//    This is achieved by explicitely specializing the functions in 'base_methods.h' for the two classes:
 //    Eigen::Map<Eigen::MatrixXd> and Eigen::MappedSparseMatrix<double> .
 //    The derived template-classes in 'functions.h' hold those objects, once assigned from a SEXP pointer.
 //    

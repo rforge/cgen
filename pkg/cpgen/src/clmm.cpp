@@ -28,7 +28,7 @@
 //    a gibbs-sampler as in Fernando et al., 2014. This is already
 //    implemented in the class defined in 'mcmc.h' through the classes
 //    defined in 'base_methods.h'
-// 2) Running several independand models at the same time, with all of them using
+// 2) Running several independent models at the same time, with all of them using
 //    the very same design-matrices. This is for cross-validation or simply running
 //    one model on a large number of phenotypes. This usually scales perfectly.
 //    The most important thing here is, that every running instance of an mcmc-object
