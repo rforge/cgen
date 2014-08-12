@@ -65,7 +65,7 @@ typedef std::vector<std::map<std::string, int> > mp_container;
 
 #include "mt_sampler.h"
 #include "effects.h"
-#include "printer.h"
+#include "../printer.h"
 
 ////////////////
 // MCMC class //

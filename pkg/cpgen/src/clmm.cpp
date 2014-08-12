@@ -37,7 +37,7 @@
 //    a Mersenne-Twister Engine and distribution functions (adopted from the Boost-libraries). 
 // 
 
-#include "clmm/clmm.h"
+#include "clmm.h"
 #include "printer.h"
 
 typedef vector<MCMC<base_methods_st> > mcmc_st;
