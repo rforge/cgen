@@ -23,15 +23,15 @@ Square matrix of dimension nrow(X)
 
 \examples{
 
-# Computing the matrix-square-root of a genomic relationship matrix:
+# Computing the matrix-square-root of a positive definite square matrix:
 \dontrun{
 # generate random data
 rand_data(500,5000)
 
-A <- cgrm.A(M,lambda=0.01)
+W <- ccross(M)
 
 # this is the implementation of the matrix power-operator '\%**\%'
-A_sqrt <- with(eigen(A), ccross(vectors,values**0.5))
+W_sqrt <- with(eigen(W), ccross(vectors,values**0.5))
 }
 }
 

@@ -8,7 +8,7 @@ This function runs linear mixed models of the following form:
 \deqn{
 \mathbf{y} = \mathbf{Xb} + \mathbf{Z}_{1}\mathbf{u}_1 + \mathbf{Z}_{2}\mathbf{u}_2 + \mathbf{Z}_{3}\mathbf{u}_3 + ... + \mathbf{Z}_{k}\mathbf{u}_k + \mathbf{e}
 }
-The function allows to include an artificial number of independent random effects with each of them being assumed to follow: \eqn{MVN(\mathbf{0},\mathbf{I}\sigma^2_{u_k})}. If the covariance structure of one random effect is assumed to follow some \eqn{\mathbf{G}} then it it necessary to construct the design matrix for
+The function allows to include an arbitrary number of independent random effects with each of them being assumed to follow: \eqn{MVN(\mathbf{0},\mathbf{I}\sigma^2_{u_k})}. If the covariance structure of one random effect is assumed to follow some \eqn{\mathbf{G}} then it it necessary to construct the design matrix for
 that random effect as described in Waldmann et al. (2008): \eqn{\mathbf{F} = \mathbf{ZG}^{1/2}}.
 
 
@@ -53,7 +53,7 @@ running a model. Even for larger sample sizes the parallel performance still dep
 Good results in terms of parallel scaling were observed starting from 50000 observations and more than 10000 features (i.e. number of markers).
 Single threaded performance is very good thanks to smart computations during gibbs sampling (Fernando, 2013 (personal communication), de los Campos et al., 2009) 
 and the use of efficient Eigen-methods for dense and sparse algebra.
-The function is capable of running Single Step Bayesian Regression (Fernando et al., 2014).
+
 
 }
 
