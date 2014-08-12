@@ -328,9 +328,6 @@ SEXP ccross(SEXP Xa, SEXP Da, SEXP threadsR){
 
 }
 
-/////////////////////////
-/// Internal Use Only ///
-/////////////////////////
 
 
 // csolve

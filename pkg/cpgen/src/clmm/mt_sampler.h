@@ -29,6 +29,7 @@
 class sampler {
 
 private:
+
   std::mt19937 gen;
 
 public:

@@ -27,6 +27,10 @@
 
 #include "function_base.h"
 
+/////////////////////
+// function_fixed //
+////////////////////
+
 
 template<class T>
 class function_fixed: public function_base {

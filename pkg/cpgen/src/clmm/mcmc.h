@@ -21,6 +21,29 @@
 // <http://www.gnu.org/licenses/>.
 */
 
+// 
+// This is the main class for 'clmm'. It did not necessarily have to be 
+// a template class, but I wanted compiletime polymorphism in order to
+// be able to surpass OpenMP entirely. 
+// The reason for two different classes is simply the enormous overhead
+// induced by OpenMP. In small datasets it does not make any sense to run
+// things in parallel, actually it would decrease the performance dramatically.
+//
+// There are three layers of polymorphism which are achieved
+// by a strategy pattern using virtual classes or by templates:
+//
+// 1) Single or Multithreaded:
+//    The behaviour is defined by the base-class: base_methods_abstract ('base_methods_abstract.h')
+//    from which the two derived classes in 'base_methods.h' inherit.
+// 2) Method to apply for a fixed or random effect.
+//    This is implemented using the base class in 'function_base.h' from which 
+//    , as of now, three classes inherit ('functions.h').
+// 3) Sparse or dense design matrices.
+//    This achieved by explicetly specializing the functions in 'base_methods.h' for the two classes:
+//    Eigen::Map<Eigen::MatrixXd> and Eigen::MappedSparseMatrix<double> .
+//    The derived template-classes in 'functions.h' hold those objects, once assigned from a SEXP pointer.
+//    
+
 typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::Map<Eigen::MatrixXd> MapMatrixXd;
 typedef Eigen::MappedSparseMatrix<double> MapSparseMatrixXd;
@@ -237,9 +260,9 @@ MCMC<F>::MCMC(const MyString& mcmc_source) {
 template<class F>
 void MCMC<F>::initialize() {
 
-// here we assing the base_function class outside
-// the destructor to prevend the nightmare of having to 
-// code copy constructures for every single virtual and 
+// here we assign the base_function class outside
+// the constructor to prevent the nightmare of having to 
+// code copy constructors for every single virtual and 
 // derived class
 
   delete my_base_functions;
@@ -268,7 +291,7 @@ void MCMC<F>::initialize() {
 
   int n_threads;
 
-// container to store start and length for OpenMp threads - Credit: Hao Cheng (Iowa State University)
+// container to store start and length for OpenMP threads - Credit: Hao Cheng (Iowa State University)
 // get the number of threads
 #pragma omp parallel
 {

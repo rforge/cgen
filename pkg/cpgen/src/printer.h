@@ -1,11 +1,27 @@
-#ifndef _PRINTER_H
-#define _PRINTER_H
-#include <stdio.h>
-#include <iomanip>
-#include <Rcpp.h>
-#include <iostream> 
-#include <string.h>
+/*
+// printer.h
+// Claas Heuer, June 2014
+//
+// Copyright (C)  2014 Claas Heuer
+//
+// This file is part of cpgen.
+//
+// cpgen is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// cpgen is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// in file.path(R.home("share"), "licenses").  If not, see
+// <http://www.gnu.org/licenses/>.
+*/
 
+//
 // this is a class for printing progress to the screen.
 // an option was RcppProgress but it needs some adjustment in terms
 // of flushing (unbuffered output).
@@ -18,6 +34,16 @@
 //
 // Main idea was taken from: http://www.codeproject.com/Tips/537904/Console-simple-progress
 //
+
+#ifndef _PRINTER_H
+#define _PRINTER_H
+#include <stdio.h>
+#include <iomanip>
+#include <Rcpp.h>
+#include <iostream> 
+#include <string.h>
+
+
 
 class printer {
 

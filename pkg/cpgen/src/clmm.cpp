@@ -21,7 +21,23 @@
 // <http://www.gnu.org/licenses/>.
 */
 
-#include "clmm.h"
+//
+// Here we use two different ways of parallelization.
+//
+// 1) Using parallel computations in every iteration of 
+//    a gibbs-sampler as in Fernando et al., 2014. This is already
+//    implemented in the class defined in 'mcmc.h' through the classes
+//    defined in 'base_methods.h'
+// 2) Running several independand models at the same time, with all of them using
+//    the very same design-matrices. This is for cross-validation or simply running
+//    one model on a large number of phenotypes. This usually scales perfectly.
+//    The most important thing here is, that every running instance of an mcmc-object
+//    has its very own random-number-generator. This is achieved by encapsulating
+//    the RNG-engine in the class defined in 'mt_sampler.h'. C++11 already comes with
+//    a Mersenne-Twister Engine and distribution functions (adopted from the Boost-libraries). 
+// 
+
+#include "clmm/clmm.h"
 #include "printer.h"
 
 typedef vector<MCMC<base_methods_st> > mcmc_st;
@@ -105,7 +121,7 @@ if((p>1) | (threads==1)) {
 } else {
 
 // if the number of threads is larger than and the number of phenotypes is equal to 1 
-// the function runs one parallelized Gibbs Sampler - Fernando et al. 2014
+// the function runs one parallelized Gibbs Sampler 
 
 // fill the container with mcmc_objects
     for(int i=0;i<1;i++) {
