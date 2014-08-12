@@ -15,7 +15,7 @@ use of OpenMP.
 \tabular{ll}{
 Package: \tab cpgen\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
+Version: \tab 0.1\cr
 Date: \tab 2014-07-10\cr
 License: \tab License: GPL (>= 2)\cr
 }
