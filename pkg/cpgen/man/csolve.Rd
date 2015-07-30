@@ -4,18 +4,20 @@
 csolve
 }
 \description{
-This is a wrapper for the Cholesky-solver 'llt' from Eigen.
+This is a wrapper for the Cholesky-solvers 'LLT' (dense case) or 'Simplicial-LLT' (sparse case) from Eigen.
 The function computes the solution: \deqn{\mathbf{b} = \mathbf{X}^{-1} \mathbf{y}}
 If no vector \code{y} is passed, an identity matrix will be assigned
-and the functions returns the inverse of \eqn{\mathbf{X}}.
+and the function returns the inverse of \eqn{\mathbf{X}}.
+In the case of multiple right hand sides (as is the case when computing an inverse matrix)
+multiple threads will solve equal parts of it.
 }
 \usage{
 csolve(X,y=NULL)	
 }
 
 \arguments{
-  \item{X}{positive definite square matrix}
-  \item{y}{vector of length equal to columns/rows of \code{X}}
+  \item{X}{positive definite square matrix of type \code{matrix} or \code{dgCMatrix}}
+  \item{y}{numeric vector of length equal to columns/rows of \code{X}}
 }
 
 \value{

@@ -25,21 +25,27 @@
 
 cGWAS <- function(y,M,X=NULL,V=NULL,dom=FALSE, verbose=TRUE){
 
+if(!is.vector(y) | !is.numeric(y)) stop("y must be a numeric vector")
+y <- as.numeric(y)
 id = 1:length(y)
 isy = id[!is.na(y)]
 n = length(isy)
-if(n<length(y)) { stop("NA's are not allowed")}
+if(n<length(y)) { stop("NA's in y are not allowed")}
 sparse=FALSE
 
-if(missing(X)) { X<-array(1,dim=c(n,1))}
-if(missing(V)) {
-  V<-sparseMatrix(i=1:n,j=1:n,x=rep(1,n))
-  sparse=TRUE 
-  } else {
-    if (class(V) == "dgCMatrix"){sparse=TRUE} else { 
-      if (class(V) != "matrix") { stop("V must be either of type 'matrix' or 'dgCMatrix'") } 
-    }
+if(is.null(X)) X<-array(1,dim=c(n,1))
+if(is.null(V)) V<-sparseMatrix(i=1:n,j=1:n,x=rep(1,n))
+if(class(X)!="matrix") stop("X must be of type 'matrix'")
+if(anyNA(X)) stop("NAs in X are not allowed")
+if(class(M)!="matrix") stop("M must be of type 'matrix'")
+if(anyNA(M)) stop("NAs in M are not allowed")
+
+if (class(V) == "dgCMatrix"){
+  sparse=TRUE
+} else { 
+    if (class(V) != "matrix") { stop("V must be either of type 'matrix' or 'dgCMatrix'") } 
   }
+
 
 ## this is only for internal use, namely: cGWAS.emmax
 second_transform=FALSE;
@@ -72,29 +78,34 @@ return(gwa)
 
 cGWAS.emmax <- function(y,M,A=NULL,X=NULL,dom=FALSE,verbose=TRUE,scale_a = 0, df_a = -2, scale_e = 0, df_e = -2,niter=15000,burnin=7500,seed=NULL){
 
+if(!is.vector(y) | !is.numeric(y)) stop("y must be a numeric vector")
+y <- as.numeric(y)
 id = 1:length(y)
 isy = id[!is.na(y)]
 n = length(isy)
-if(!is.vector(y) | !is.numeric(y)) stop("y must be a numeric vector")
 if(n<length(y))   stop("NAs in y are not allowed")
+if(is.null(X)) X <- array(1,dim=c(n,1))
+
+if(class(X)!="matrix") stop("X must be of type 'matrix'")
+if(anyNA(X)) stop("NAs in X are not allowed")
+if(class(M)!="matrix") stop("M must be of type 'matrix'")
 if(anyNA(M)) stop("NAs in M are not allowed")
-if(missing(X)) X <- array(1,dim=c(n,1))
 
 if(verbose) cat("\nComputing Eigen Decomposition and Estimating V\n")
 
 lambda=0.01
-if(missing(A)){
-  UD <- eigen(cgrm(M,lambda=lambda)) 
-} else {
-    UD <- eigen(A)
-  }
+if(is.null(A)) A = cgrm(M,lambda=lambda)
+if(class(A)!="matrix") stop("A must be of type 'matrix'")
+if(anyNA(A)) stop("NAs in A are not allowed")
+
+UD <- eigen(A)
 
 UX <- t(UD$vectors) %c% X
 Uy <- (t(UD$vectors) %c% y)[,1]
 D_sqrt <- sqrt(UD$values)
 Z <- sparseMatrix(i=1:n,j=1:n,x=D_sqrt)
 
-par_random <- list(list(scale=scale_a,df=df_a,sparse_or_dense="sparse",method="random"))
+par_random <- list(list(scale=scale_a,df=df_a,sparse_or_dense="sparse",method="ridge"))
 if(missing(seed)) { seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) %% 2^31) }
 
 # set the number of threads to 1 for clmm

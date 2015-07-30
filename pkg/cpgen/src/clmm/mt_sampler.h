@@ -39,9 +39,15 @@ public:
 
   };
 
-  double rchisq(int df){
+  double rchisq(double df){
 
     return std::chi_squared_distribution<double>(df)(gen);
+
+  };
+
+  int rbinom(size_t trials, double prob){
+
+    return std::binomial_distribution<int>(trials, prob)(gen);
 
   };
 

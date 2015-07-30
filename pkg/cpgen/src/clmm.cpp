@@ -38,15 +38,21 @@
 // 
 
 #include "clmm.h"
-#include "printer.h"
+
+//#include "printer.h"
 
 typedef vector<MCMC<base_methods_st> > mcmc_st;
-typedef vector<MCMC<base_methods_mp> > mcmc_mp;
 
-SEXP clmm(SEXP yR, SEXP XR, SEXP par_XR, SEXP list_of_design_matricesR, SEXP par_design_matricesR, SEXP par_mcmcR, SEXP verboseR, SEXP threadsR){
+SEXP clmm(SEXP yR, SEXP XR, SEXP par_XR, SEXP list_of_design_matricesR, SEXP par_design_matricesR, SEXP par_mcmcR, SEXP verboseR, SEXP threadsR, SEXP use_BLAS){
 
 int threads = as<int>(threadsR); 
 int verbose = as<int>(verboseR); 
+bool BLAS = Rcpp::as<bool>(use_BLAS);
+
+Rcpp::List list_of_phenotypes(yR);
+Rcpp::List list_of_par_design_matrices(par_design_matricesR);
+Rcpp::List list_of_par_mcmc(par_mcmcR);
+int p = list_of_phenotypes.size();
 
 //omp_set_dynamic(0);
 omp_set_num_threads(threads);
@@ -54,24 +60,27 @@ omp_set_num_threads(threads);
 Eigen::setNbThreads(1);
 Eigen::initParallel();
 
-Rcpp::List list_of_phenotypes(yR);
-int p = list_of_phenotypes.size();
-
-printer prog(p / threads);
+int max = p / threads;
+if(max < 1) max = 1;
+//printer prog(max);
 
 Rcpp::List summary_out;
 
 mcmc_st vec_mcmc_st;
-mcmc_mp vec_mcmc_mp;
+MCMC_abstract * single_mcmc;
 
+Rcpp::List Summary;
 
-if((p>1) | (threads==1)) {
+bool multiple_phenos = false;
 
+// CV
+if(p > 1) {
+
+  multiple_phenos = true;
 // fill the container with mcmc_objects
   for(int i=0;i<p;i++) {
   
-
-    vec_mcmc_st.push_back(MCMC<base_methods_st>(list_of_phenotypes[i], XR, par_XR, list_of_design_matricesR ,par_design_matricesR, par_mcmcR,i));
+    vec_mcmc_st.push_back(MCMC<base_methods_st>(list_of_phenotypes[i], XR, par_XR, list_of_design_matricesR ,list_of_par_design_matrices[i], list_of_par_mcmc[i],i));
 
   }
 
@@ -81,34 +90,25 @@ if((p>1) | (threads==1)) {
 
   }
 
-  if ((p > 1) & verbose) { prog.initialize(); }
+//  if ((p > 1) & verbose) { prog.initialize(); }
 
 // this looks easy - the work was to allow this step to be parallelized
-#pragma omp parallel for 
-  for(unsigned int i=0;i<vec_mcmc_st.size();i++){
-
-    vec_mcmc_st.at(i).gibbs();
-
 // verbose
+  Progress * prog = new Progress(vec_mcmc_st.size(), verbose);
 
-    if(p>1) {
+#pragma omp parallel for 
+      for(unsigned int i=0;i<vec_mcmc_st.size();i++){
 
-      if(verbose) { 
-   
-        if(omp_get_thread_num()==0) {
+        if ( ! Progress::check_abort() ) {
 
-          prog.DoProgress(); 
+          vec_mcmc_st.at(i).gibbs();
+          prog->increment();
 
         }
 
       }
 
-    }
 
-  }
-
-
-  Rcpp::List Summary;
   for(mcmc_st::iterator it = vec_mcmc_st.begin(); it != vec_mcmc_st.end(); it++) {
 
     it->summary();
@@ -116,41 +116,53 @@ if((p>1) | (threads==1)) {
 
   }
 
+
+  delete prog;
   summary_out = Summary;
+
 
 } else {
 
-// if the number of threads is larger than and the number of phenotypes is equal to 1 
-// the function runs one parallelized Gibbs Sampler 
+// Dont know whether it is possible to control threads for OMP and BLAS seperately
+// Single Model Run
 
-// fill the container with mcmc_objects
-    for(int i=0;i<1;i++) {
-  
-      vec_mcmc_mp.push_back(MCMC<base_methods_mp>(list_of_phenotypes[i], XR, par_XR, list_of_design_matricesR ,par_design_matricesR, par_mcmcR,i));
+    if (threads==1 & !BLAS) { 
 
-    }
-
-    for(mcmc_mp::iterator it = vec_mcmc_mp.begin(); it != vec_mcmc_mp.end(); it++) {
-
-      it->initialize();
-      it->gibbs();
+      single_mcmc = new MCMC<base_methods_st>(list_of_phenotypes[0], XR, par_XR, list_of_design_matricesR, 
+                                              list_of_par_design_matrices[0], list_of_par_mcmc[0],0);
 
     }
 
+    if (threads>1 & !BLAS) { 
 
-    Rcpp::List Summary;
-    for(mcmc_mp::iterator it = vec_mcmc_mp.begin(); it != vec_mcmc_mp.end(); it++) {
-
-      it->summary();
-      Summary[it->get_name()] = it->get_summary();     
+      single_mcmc = new MCMC<base_methods_mp>(list_of_phenotypes[0], XR, par_XR, list_of_design_matricesR, 
+                                              list_of_par_design_matrices[0], list_of_par_mcmc[0],0);
 
     }
 
+    if (BLAS) { 
 
+      single_mcmc = new MCMC<base_methods_BLAS>(list_of_phenotypes[0], XR, par_XR, list_of_design_matricesR, 
+                                                list_of_par_design_matrices[0], list_of_par_mcmc[0],0);
+
+    }
+
+    single_mcmc->initialize();
+    Progress * prog = new Progress(single_mcmc->get_niter() , single_mcmc->get_verbose());
+//    single_mcmc->gibbs(prog);
+    single_mcmc->gibbs(prog);
+    single_mcmc->summary();
+    Summary[single_mcmc->get_name()] = single_mcmc->get_summary();  
+
+    delete single_mcmc; 
+    delete prog;
     summary_out = Summary;
-
+  
   }
 
+
+    
+////////////
 
 return summary_out;
 

@@ -43,6 +43,7 @@ inline void initialize(base_methods_abstract*& base_fun,VectorXd& xtx, int& colu
 inline void sample_effects(base_methods_abstract*& base_fun,VectorXd& xtx, VectorXd& estimates, double * ycorr, VectorXd& var, double * var_e, sampler& mcmc_sampler, mp_container& thread_vec);
 inline void sample_variance(VectorXd& var, double& scale, double& df, VectorXd& estimates, int& columns, sampler& mcmc_sampler, vector<double>& var_posterior,int niter){};
 inline void update_means(VectorXd& mean_estimates, VectorXd& estimates, VectorXd& mean_var, VectorXd& var); 
+inline Eigen::VectorXd predict(VectorXd& mean_estimates, int start, int length);
 inline Rcpp::List summary(VectorXd& mean_estimates, VectorXd& mean_var, int effiter, vector<double>& var_posterior);
 function_fixed(SEXP design_matrix_pointer) : design_matrix(as<T>(design_matrix_pointer)){};
 ~function_fixed(){};
@@ -63,7 +64,8 @@ void function_fixed<T>::initialize(base_methods_abstract*& base_fun,VectorXd& xt
 template<class T>
 void function_fixed<T>::sample_effects(base_methods_abstract*& base_fun,VectorXd& xtx, VectorXd& estimates, double * ycorr, VectorXd& var, double * var_e, sampler& mcmc_sampler, mp_container& thread_vec) {
 
-  base_fun->sample_effects(design_matrix,xtx,estimates,ycorr,var,var_e, mcmc_sampler, thread_vec);
+
+  base_fun->sample_effects(design_matrix,xtx,estimates,ycorr,var,var_e, mcmc_sampler, thread_vec, 0.0);
 
 }
 
@@ -71,6 +73,13 @@ template<class T>
 void function_fixed<T>::update_means(VectorXd& mean_estimates, VectorXd& estimates, VectorXd& mean_var, VectorXd& var) {
 
   mean_estimates += estimates;
+   
+}
+
+template<class T>
+Eigen::VectorXd function_fixed<T>::predict(VectorXd& mean_estimates, int start, int length) {
+
+  return design_matrix.block(0,start,design_matrix.rows(),length) * mean_estimates.segment(start,length);
    
 }
 
@@ -96,6 +105,7 @@ inline void initialize(base_methods_abstract*& base_fun,VectorXd& xtx, int& colu
 inline void sample_effects(base_methods_abstract*& base_fun,VectorXd& xtx, VectorXd& estimates, double * ycorr, VectorXd& var, double * var_e, sampler& mcmc_sampler, mp_container& thread_vec);
 inline void sample_variance(VectorXd& var, double& scale, double& df, VectorXd& estimates, int& columns, sampler& mcmc_sampler, vector<double>& var_posterior,int niter);
 inline void update_means(VectorXd& mean_estimates, VectorXd& estimates, VectorXd& mean_var, VectorXd& var); 
+inline Eigen::VectorXd predict(VectorXd& mean_estimates, int start, int length);
 inline Rcpp::List summary(VectorXd& mean_estimates, VectorXd& mean_var, int effiter, vector<double>& var_posterior);
 function_random(SEXP design_matrix_pointer) : design_matrix(as<T>(design_matrix_pointer)){};
 ~function_random(){};
@@ -139,6 +149,14 @@ void function_random<T>::update_means(VectorXd& mean_estimates, VectorXd& estima
    
 }
 
+
+template<class T>
+Eigen::VectorXd function_random<T>::predict(VectorXd& mean_estimates, int start, int length) {
+
+  return design_matrix.block(0,start,design_matrix.rows(),length) * mean_estimates.segment(start,length);
+   
+}
+
 template<class T>
 Rcpp::List function_random<T>::summary(VectorXd& mean_estimates, VectorXd& mean_var, int effiter, vector<double>& var_posterior) {
 
@@ -164,6 +182,7 @@ inline void initialize(base_methods_abstract*& base_fun,VectorXd& xtx, int& colu
 inline void sample_effects(base_methods_abstract*& base_fun,VectorXd& xtx, VectorXd& estimates, double * ycorr, VectorXd& var, double * var_e, sampler& mcmc_sampler, mp_container& thread_vec);
 inline void sample_variance(VectorXd& var, double& scale, double& df, VectorXd& estimates, int& columns, sampler& mcmc_sampler, vector<double>& var_posterior,int niter);
 inline void update_means(VectorXd& mean_estimates, VectorXd& estimates, VectorXd& mean_var, VectorXd& var); 
+inline Eigen::VectorXd predict(VectorXd& mean_estimates, int start, int length);
 inline Rcpp::List summary(VectorXd& mean_estimates, VectorXd& mean_var, int effiter, vector<double>& var_posterior);
 function_bayesA(SEXP design_matrix_pointer) : design_matrix(as<T>(design_matrix_pointer)){};
 ~function_bayesA(){};
@@ -201,6 +220,14 @@ void function_bayesA<T>::update_means(VectorXd& mean_estimates, VectorXd& estima
 
   mean_estimates += estimates;
   mean_var += var;
+   
+}
+
+
+template<class T>
+Eigen::VectorXd function_bayesA<T>::predict(VectorXd& mean_estimates, int start, int length) {
+
+  return design_matrix.block(0,start,design_matrix.rows(),length) * mean_estimates.segment(start,length);
    
 }
 

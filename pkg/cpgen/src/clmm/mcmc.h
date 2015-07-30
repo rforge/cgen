@@ -63,16 +63,23 @@ typedef std::vector<std::map<std::string, int> > mp_container;
 // #include "R_sampler.h"
 //#endif
 
+#include "mcmc_abstract.h"
 #include "mt_sampler.h"
 #include "effects.h"
 #include "../printer.h"
+// only available from gcc 4.7 onwards.
+// Rtools uses 4.6.3, so we can't include chrono
+// #include <chrono>  //FIXME TIMING
+// tradidtional C-Way:
+#include <sys/time.h>
+
 
 ////////////////
 // MCMC class //
 ////////////////
 
 template<class F>
-class MCMC {
+class MCMC : public MCMC_abstract {
 
 private:
 
@@ -80,6 +87,7 @@ private:
   int  burnin;
   bool full_output;
   bool verbose;
+  bool timings;
   bool initialized;
 
   double scale_e;
@@ -124,11 +132,19 @@ public:
   bool has_na;
   vector<int> isna;
 
+//  for timings
+//  std::chrono::high_resolution_clock::time_point t0; //FIXME TIMING
+//  std::chrono::high_resolution_clock::time_point t1; //FIXME TIMING
+  struct timeval t0;
+  struct timeval t1;
+  double time_temp;
+  double mean_time_per_iter;
+
 //  void populate(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number);
+  int get_niter() { return niter; };
+  bool get_verbose() { return verbose; };
   inline void initialize();
-  inline void sample_random();
-  inline void sample_residual();
-  inline void finish_iteration();
+  inline void gibbs(Progress * prog);
   inline void gibbs();
   inline void summary();
   std::string get_name();
@@ -139,7 +155,7 @@ public:
    MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_design_matrices_from_R, 
    SEXP par_design_matrices_from_R, SEXP par_from_R, int phenotype_number);
 //   MCMC(const MyString& mcmc_source);
-  ~MCMC(){ delete my_base_functions; };
+  ~MCMC(){ delete my_base_functions;};
 
 };
 
@@ -157,19 +173,19 @@ MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_
   burnin = Rcpp::as<int>(par["burnin"]);
   full_output = Rcpp::as<bool>(par["full_output"]);
   verbose = Rcpp::as<bool>(par["verbose"]);
+  timings = Rcpp::as<bool>(par["timings"]);
   scale_e = Rcpp::as<double>(par["scale_e"]);
   df_e = Rcpp::as<double>(par["df_e"]);
   seed = Rcpp::as<std::string>(par["seed"]);
+  name = Rcpp::as<std::string>(par["name"]);
 
   par_fixed = Rcpp::List(par_fixed_from_R);
   par_random = Rcpp::List(par_design_matrices_from_R);
 
-  std::ostringstream oss; 
-  oss << phenotype_number + 1; 
-  name = "PHENOTYPE_" + oss.str();
-
 // this is to ensure that if a couple of models are run at the same time
 // that every instance has got a unique seed - openmp
+  std::ostringstream oss; 
+  oss << phenotype_number + 1;
   seed.append(oss.str());
   mcmc_sampler = sampler(seed);
 //  my_base_functions = new F;
@@ -182,7 +198,7 @@ MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_
   post_var_e=0;
 
   n = y.size();
-  n_random = list_of_design_matrices.size() -1;
+  n_random = list_of_design_matrices.size();
   if(n_random<1) n_random=1;
 
 // check for NAs in pehnotype vector
@@ -193,6 +209,7 @@ MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_
   var_y=0;
   isna = vector<int>();
   model_effects = vector<effects>();
+
   initialized = false;
 
 }
@@ -206,7 +223,7 @@ MCMC<F>::MCMC(SEXP y_from_R, SEXP X_from_R, SEXP par_fixed_from_R, SEXP list_of_
 //////////////////////
 
 template<class F>
-MCMC<F>::MCMC(const MyString& mcmc_source) {
+MCMC<F>::MCMC(const MCMC& mcmc_source) {
 
   niter = mcmc_source.niter;
   burnin = mcmc_source.burnin;
@@ -256,7 +273,6 @@ MCMC<F>::MCMC(const MyString& mcmc_source) {
 
 */
 
-
 template<class F>
 void MCMC<F>::initialize() {
 
@@ -266,7 +282,6 @@ void MCMC<F>::initialize() {
 // derived class
 
   delete my_base_functions;
-
   my_base_functions = new F; 
 
 //  isna.clear();
@@ -314,28 +329,15 @@ for(int i=0;i<n_threads;i++) {
 
 // populate with effects
 // include fixed effect
-
   model_effects.clear();
   model_effects.push_back(effects(X_design_matrix, ycorr.data(),par_fixed, &var_e, var_y,n_random,niter, burnin, full_output)); 
-
 // random effects
 
   for(int i=0;i<list_of_design_matrices.size();i++){
 
-    SEXP temp_list_sexp = par_random[i];
-
-    Rcpp::List temp_list(temp_list_sexp);
-
-    model_effects.push_back(effects(list_of_design_matrices[i],ycorr.data(),temp_list, &var_e, var_y,n_random,niter, burnin, full_output)); 
+    model_effects.push_back(effects(list_of_design_matrices[i], ycorr.data(), Rcpp::List(par_random[i]), &var_e, var_y, n_random, niter, burnin, full_output)); 
 
   }
-
-
-
-
-//  Rcout << endl << "MCMC I am single_thread" << endl;
-
-
 
 
 // initializing effects
@@ -346,56 +348,143 @@ for(int i=0;i<n_threads;i++) {
 
     }
 
+    mean_time_per_iter = 0;
     initialized = true;
 
 }
 
+// gibbs for single run (just needed for verbosing stuff)
+
+template<class F>
+void MCMC<F>::gibbs(Progress * prog) {
+
+  if(!initialized) initialize();
+
+  vector<effects>::iterator it;  
+
+//  printer prog(niter);
+//  Progress prog(niter, verbose);
+//  if(verbose) { prog.initialize(); }
+
+    for(int gibbs_iter=0; gibbs_iter<niter; gibbs_iter++){
+
+// check for interrupt from R
+//    if (omp_get_thread_num() == 0) R_CheckUserInterrupt();
+//    if(!multiple_phenos) R_CheckUserInterrupt();
+      if ( ! Progress::check_abort() ) {
+      	
+// timings
+//    if(timings) t0 = std::chrono::high_resolution_clock::now(); //FIXME TIMING
+        if(timings) gettimeofday(&t0, NULL);
+
+        for(it = model_effects.begin(); it != model_effects.end(); it++) {
+
+          it->sample_effects(mcmc_sampler,my_base_functions,thread_vec, gibbs_iter);
+
+        }
+
+        for(it = model_effects.begin(); it != model_effects.end(); it++) {
+
+          it->sample_variance(mcmc_sampler, gibbs_iter);
+
+        }
+
+// sample residual variance
+
+     var_e = (ycorr.matrix().squaredNorm() + scale_e * df_e) / mcmc_sampler.rchisq(n + df_e);
+     mean_var_e(gibbs_iter)=var_e;
+
+// residual noise to NAs -- Reference: de los Campos (2009) - BLR
+      if(has_na) {
+     
+        for (unsigned int i=0;i<isna.size();i++) {ycorr(isna[i]) = mcmc_sampler.rnorm(0,sqrt(var_e));}
+
+      }
+
+// posterior means
+
+      if(gibbs_iter > (burnin - 1)) {
+
+        for(it = model_effects.begin(); it != model_effects.end(); it++) {
+
+          it->update_means();
+
+        }
+
+      post_var_e += var_e;
+      effiter++;
+
+      }
+
+
+// timings
+      if(timings) {
+
+//      t1 = std::chrono::high_resolution_clock::now(); //FIXME TIMING
+//      time_temp = std::chrono::duration_cast<std::chrono::milliseconds>(t1-t0).count() / 1000.0; //FIXME TIMING
+        gettimeofday(&t1, NULL);
+// taken from here: http://stackoverflow.com/questions/16764276/measuring-time-in-millisecond-precision
+        time_temp = (t1.tv_sec - t0.tv_sec) + (t1.tv_usec - t0.tv_usec) / 1000000.0;
+        mean_time_per_iter += time_temp;
+        Rcpp::Rcout << std::endl 
+                    << " Iteration: |"   << gibbs_iter + 1 
+//                  << "|  var_e: |"     << var_e  
+                    << "|  secs/iter: |" << time_temp
+                    << "|"               << std::endl;
+
+      }
+      
+      prog->increment();
+
+    }
+
+  } 
+
+}
+
+
+// gibbs for multiple phenos run (just needed for verbosing stuff)
 
 template<class F>
 void MCMC<F>::gibbs() {
 
-if(!initialized) initialize();
+  if(!initialized) initialize();
 
-vector<effects>::iterator it;  
-
-  printer prog(niter);
-  if(verbose) { prog.initialize(); }
+  vector<effects>::iterator it;  
 
   for(int gibbs_iter=0; gibbs_iter<niter; gibbs_iter++){
 
-
     for(it = model_effects.begin(); it != model_effects.end(); it++) {
 
-    it->sample_effects(mcmc_sampler,my_base_functions,thread_vec);
+      it->sample_effects(mcmc_sampler,my_base_functions,thread_vec, gibbs_iter);
 
     }
 
     for(it = model_effects.begin(); it != model_effects.end(); it++) {
 
-    it->sample_variance(mcmc_sampler, gibbs_iter);
+      it->sample_variance(mcmc_sampler, gibbs_iter);
 
     }
-
-
 
 // sample residual variance
 
-   var_e = (ycorr.matrix().squaredNorm() + scale_e * df_e) / mcmc_sampler.rchisq(n + df_e);
-   mean_var_e(gibbs_iter)=var_e;
+    var_e = (ycorr.matrix().squaredNorm() + scale_e * df_e) / mcmc_sampler.rchisq(n + df_e);
+    mean_var_e(gibbs_iter)=var_e;
 
 // residual noise to NAs -- Reference: de los Campos (2009) - BLR
-    if(has_na) 
-     {
-       for (unsigned int i=0;i<isna.size();i++) {ycorr(isna[i]) = mcmc_sampler.rnorm(0,sqrt(var_e));}
-     }
+    if(has_na) {
+     
+      for (unsigned int i=0;i<isna.size();i++) ycorr(isna[i]) = mcmc_sampler.rnorm(0,sqrt(var_e));
+
+    }
 
 // posterior means
 
-    if(gibbs_iter>burnin) {
+    if(gibbs_iter > (burnin - 1)) {
 
       for(it = model_effects.begin(); it != model_effects.end(); it++) {
 
-      it->update_means();
+        it->update_means();
 
       }
 
@@ -404,20 +493,10 @@ vector<effects>::iterator it;
 
     }
 
-    if (verbose) {
-
-      prog.DoProgress();
-
-    }
-
-//    if(verbose) { Rcout << endl << "Iteration: " << gibbs_iter << "   s2e: " << var_e; }
-
-  }
-
-//  if(verbose) { Rcout << endl; }
-
+  } 
 
 }
+
 
 
 template<class F>
@@ -445,14 +524,19 @@ void MCMC<F>::summary() {
 
   for(vector<effects>::iterator it = model_effects.begin(); it != model_effects.end(); it++) {
   
-    std::ostringstream oss; 
-    oss << count;
-    list_name = "Effect_" + oss.str();
-    summary_list[list_name] = it->get_summary(effiter);
+    summary_list[it->get_name()] = it->get_summary(effiter);
     count++;
-  }
-  
 
+  }
+
+  Rcpp::List mcmc_out;
+  mcmc_out["niter"] = niter;
+  mcmc_out["burnin"] = burnin;
+  mcmc_out["number_of_samples"] = effiter;
+  mcmc_out["seed"] = seed;
+  if(timings) mcmc_out["time_per_iter"] = mean_time_per_iter / niter;
+  summary_list["mcmc"] = mcmc_out;
+  
 }
 
 
@@ -472,5 +556,4 @@ Rcpp::List MCMC<F>::get_summary() {
  return summary_list;
 
 }
-
 
